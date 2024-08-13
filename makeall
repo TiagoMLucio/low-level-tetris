@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd ./uspi/env/lib
+make $1 $2 || exit
+cd ../../..
+
+cd ./
+make $1 $2 || exit
