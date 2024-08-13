@@ -1,0 +1,222 @@
+Archive member included to satisfy reference by file (symbol)
+
+/usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+                              fb.o (memset)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+.text           0x0000000000008000      0x7fc
+ boot.o(.text)
+ .text          0x0000000000008000       0x44 boot.o
+                0x0000000000008000                start
+                0x000000000000802c                delay
+ *(.text)
+ .text          0x0000000000008044      0x138 cpu.o
+                0x0000000000008044                get_arm_mode
+                0x0000000000008050                set_arm_mode
+                0x0000000000008068                get_core
+                0x0000000000008074                enable_irq
+                0x000000000000809c                enable_fiq
+                0x00000000000080c4                init_core
+                0x00000000000080e4                enable_cache
+                0x00000000000080f8                disable_mmu
+                0x0000000000008110                enable_mmu
+                0x0000000000008134                flush_tlb
+                0x0000000000008148                get_lock
+                0x0000000000008164                put_lock
+ .text          0x000000000000817c       0x64 stubs.o
+                0x000000000000817c                _fstat
+                0x000000000000818c                _lseek
+                0x0000000000008194                _close
+                0x000000000000819c                _write
+                0x00000000000081a4                _read
+                0x00000000000081ac                _sbrk
+                0x00000000000081c8                _isatty
+                0x00000000000081d0                _exit
+                0x00000000000081d4                _kill
+                0x00000000000081d8                _getpid
+ .text          0x00000000000081e0      0x254 fb.o
+                0x00000000000081e0                gpu_read
+                0x0000000000008210                gpu_write
+                0x000000000000823c                gpu_msg
+                0x0000000000008294                fb_pixel
+                0x00000000000082d8                init_fb
+                0x0000000000008404                pack_color
+ .text          0x0000000000008434      0x2ac main.o
+                0x0000000000008434                draw_line
+                0x00000000000084ec                draw_frame
+                0x00000000000085b8                draw_square
+                0x0000000000008600                draw_block
+ .text          0x00000000000086e0      0x11c /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+                0x00000000000086e0                memset
+
+.glue_7         0x00000000000087fc        0x0
+ .glue_7        0x00000000000087fc        0x0 linker stubs
+
+.glue_7t        0x00000000000087fc        0x0
+ .glue_7t       0x00000000000087fc        0x0 linker stubs
+
+.vfp11_veneer   0x00000000000087fc        0x0
+ .vfp11_veneer  0x00000000000087fc        0x0 linker stubs
+
+.v4_bx          0x00000000000087fc        0x0
+ .v4_bx         0x00000000000087fc        0x0 linker stubs
+
+.iplt           0x00000000000087fc        0x0
+ .iplt          0x00000000000087fc        0x0 boot.o
+
+.text.startup   0x00000000000087fc      0x1f0
+ .text.startup  0x00000000000087fc      0x1f0 main.o
+                0x00000000000087fc                main
+
+.rodata         0x00000000000089ec       0x18
+ .rodata        0x00000000000089ec       0x18 main.o
+                0x00000000000089ec                frame_pos_y
+                0x00000000000089f0                frame_pos_x
+                0x00000000000089f4                frame_thickness
+                0x00000000000089f8                frame_height
+                0x00000000000089fc                frame_width
+                0x0000000000008a00                BLOCK_SIZE
+
+.rel.dyn        0x0000000000008a04        0x0
+ .rel.iplt      0x0000000000008a04        0x0 boot.o
+                0x0000000000008a04                . = ALIGN (0x4)
+                0x0000000000008a04                data_begin = .
+
+.data           0x0000000000008a04        0xa
+ *(.data)
+ .data          0x0000000000008a04        0x0 boot.o
+ .data          0x0000000000008a04        0x0 cpu.o
+ .data          0x0000000000008a04        0x4 stubs.o
+ .data          0x0000000000008a08        0x6 fb.o
+                0x0000000000008a08                width
+                0x0000000000008a0a                height
+                0x0000000000008a0c                depth
+ .data          0x0000000000008a0e        0x0 main.o
+ .data          0x0000000000008a0e        0x0 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.igot.plt       0x0000000000008a10        0x0
+ .igot.plt      0x0000000000008a10        0x0 boot.o
+                0x0000000000008a10                . = ALIGN (0x4)
+                0x0000000000008a10                bss_begin = .
+
+.bss            0x0000000000008a10       0x94
+ *(.bss*)
+ .bss           0x0000000000008a10        0x0 boot.o
+ .bss           0x0000000000008a10        0x0 cpu.o
+ .bss           0x0000000000008a10        0x0 stubs.o
+ .bss           0x0000000000008a10       0x94 fb.o
+                0x0000000000008a10                fb
+                0x0000000000008a14                pitch
+                0x0000000000008a20                msg
+                0x0000000000008aa0                fbsize
+ .bss           0x0000000000008aa4        0x0 main.o
+ .bss           0x0000000000008aa4        0x0 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+                0x0000000000008aa4                bss_end = .
+                0x0000000000008aa8                . = ALIGN (0x8)
+                0x0000000000008aa8                heap_addr = .
+                0x0000000000010aa8                . = (. + 0x8000)
+                0x0000000000010aa8                stack_addr = .
+LOAD cpu.o
+LOAD boot.o
+LOAD stubs.o
+LOAD fb.o
+LOAD main.o
+LOAD /usr/lib/arm-none-eabi/newlib/libc.a
+LOAD /usr/lib/gcc/arm-none-eabi/10.3.1//libgcc.a
+OUTPUT(fbuffer.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x0000000000000000       0x2e
+ .ARM.attributes
+                0x0000000000000000       0x12 boot.o
+ .ARM.attributes
+                0x0000000000000012       0x16 cpu.o
+ .ARM.attributes
+                0x0000000000000028       0x2f stubs.o
+ .ARM.attributes
+                0x0000000000000057       0x2f fb.o
+ .ARM.attributes
+                0x0000000000000086       0x2f main.o
+ .ARM.attributes
+                0x00000000000000b5       0x2a /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.comment        0x0000000000000000       0x33
+ .comment       0x0000000000000000       0x33 stubs.o
+                                         0x34 (size before relaxing)
+ .comment       0x0000000000000033       0x34 fb.o
+ .comment       0x0000000000000033       0x34 main.o
+ .comment       0x0000000000000033       0x34 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.debug_line     0x0000000000000000      0xbd5
+ .debug_line    0x0000000000000000       0x46 boot.o
+ .debug_line    0x0000000000000046       0x85 cpu.o
+ .debug_line    0x00000000000000cb      0x165 stubs.o
+ .debug_line    0x0000000000000230      0x310 fb.o
+ .debug_line    0x0000000000000540      0x4c0 main.o
+ .debug_line    0x0000000000000a00      0x1d5 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.debug_info     0x0000000000000000     0x16bb
+ .debug_info    0x0000000000000000       0x26 boot.o
+ .debug_info    0x0000000000000026       0x26 cpu.o
+ .debug_info    0x000000000000004c      0x503 stubs.o
+ .debug_info    0x000000000000054f      0x3d5 fb.o
+ .debug_info    0x0000000000000924      0xc5a main.o
+ .debug_info    0x000000000000157e      0x13d /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.debug_abbrev   0x0000000000000000      0x58c
+ .debug_abbrev  0x0000000000000000       0x14 boot.o
+ .debug_abbrev  0x0000000000000014       0x14 cpu.o
+ .debug_abbrev  0x0000000000000028      0x174 stubs.o
+ .debug_abbrev  0x000000000000019c      0x175 fb.o
+ .debug_abbrev  0x0000000000000311      0x1c7 main.o
+ .debug_abbrev  0x00000000000004d8       0xb4 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.debug_aranges  0x0000000000000000       0xc8
+ .debug_aranges
+                0x0000000000000000       0x20 boot.o
+ .debug_aranges
+                0x0000000000000020       0x20 cpu.o
+ .debug_aranges
+                0x0000000000000040       0x20 stubs.o
+ .debug_aranges
+                0x0000000000000060       0x20 fb.o
+ .debug_aranges
+                0x0000000000000080       0x28 main.o
+ .debug_aranges
+                0x00000000000000a8       0x20 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.debug_str      0x0000000000000000      0x538
+ .debug_str     0x0000000000000000       0x46 boot.o
+ .debug_str     0x0000000000000046        0x6 cpu.o
+                                         0x45 (size before relaxing)
+ .debug_str     0x000000000000004c      0x239 stubs.o
+                                        0x30f (size before relaxing)
+ .debug_str     0x0000000000000285       0x98 fb.o
+                                        0x215 (size before relaxing)
+ .debug_str     0x000000000000031d      0x130 main.o
+                                        0x236 (size before relaxing)
+ .debug_str     0x000000000000044d       0xeb /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+                                        0x195 (size before relaxing)
+
+.debug_loc      0x0000000000000000     0x13ad
+ .debug_loc     0x0000000000000000      0x13a stubs.o
+ .debug_loc     0x000000000000013a      0x27c fb.o
+ .debug_loc     0x00000000000003b6      0xce4 main.o
+ .debug_loc     0x000000000000109a      0x313 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.debug_frame    0x0000000000000000      0x248
+ .debug_frame   0x0000000000000000       0xb0 stubs.o
+ .debug_frame   0x00000000000000b0       0x84 fb.o
+ .debug_frame   0x0000000000000134       0xcc main.o
+ .debug_frame   0x0000000000000200       0x48 /usr/lib/arm-none-eabi/newlib/libc.a(lib_a-memset.o)
+
+.debug_ranges   0x0000000000000000      0x428
+ .debug_ranges  0x0000000000000000      0x428 main.o
