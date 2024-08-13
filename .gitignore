@@ -1,1 +1,11 @@
 .vscode
+*.o
+*.a
+*.elf
+*.lst
+*.img
+*.map
+*~
+Config.mk
+.directory
+tmp/
