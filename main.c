@@ -1,6 +1,7 @@
 //
 // main.c
 //
+#include <stdbool.h>
 #include <uspienv.h>
 #include <uspi.h>
 #include <uspios.h>
@@ -230,7 +231,7 @@ void fb_pixel(int x, int y, unsigned color)
    ScreenDeviceSetPixel(USPiEnvGetScreen(), x, y, color);
 }
 
-void draw_line(int x, int y, int length, unsigned color, int thickness, u8 vertical)
+void draw_line(int x, int y, int length, unsigned color, int thickness, bool vertical)
 {
    for (int i = 0; i < thickness; i++)
       for (int j = 0; j < length; j++)
@@ -309,15 +310,32 @@ int (*get_rotation(Block block))[4]
    return block_types[block.type].rotations[block.rotation];
 }
 
-u8 check_collision(Block block)
+bool check_collision(Block block)
 {
    int(*rotation)[4] = get_rotation(block);
    for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++)
-         if (rotation[i][j])
-            if (grid[block.y + 1 + i][block.x + j] || block.y + 1 + i >= 20)
-               return 1;
-   return 0;
+         if (rotation[i][j] && (grid[block.y + 1 + i][block.x + j] || block.y + 1 + i >= 20))            
+               return true;
+   return false;
+}
+
+bool check_lateral_collision(int blockX, int blockY, int i, int j, char ch) {
+   return (ch == 'a') ? (blockX + j - 1 < 0 || grid[blockY + i][blockX + j - 1]) : 
+                        (blockX + 1 + j >= 10 || grid[blockY + i][blockX + j + 1]);
+}
+
+bool check_horizontal_collision(Block block, char ch)
+{
+   int(*rotation)[4] = get_rotation(block);
+   
+   for (int i = 0; i < 4; i++) {      
+      for (int j = 0; j < 4; j++)
+         if (rotation[i][j] && check_lateral_collision(block.x, block.y, i, j, ch))
+            return true;         
+   }      
+   
+   return false;
 }
 
 Block create_tile()
@@ -357,23 +375,23 @@ void save_to_grid(Block block)
    // não verifica quando ele completa linhas de forma descontínua (linhas 16, 17 e 19 por exemplo)
    for (int i = 0; i < 4 && block.y + i < 20; i++)
    {
-      u8 addedToLine = 0;
+      bool addedToLine = 0;
       for (int j = 0; j < 4; j++)
       {
          if (block.x + j < 10 && rotation[i][j])
          {
             grid[block.y + i][block.x + j] = rotation[i][j] ? color : 0;
-            addedToLine = 1;
+            addedToLine = true;
          }
       }
       if (addedToLine)
       {
 
-         u8 full_line = 1;
+         bool full_line = 1;
          for (int j = 0; j < 10; j++)
          {
             if (!grid[block.y + i][j])
-               full_line = 0;
+               full_line = false;
          }
 
          if (full_line)
@@ -437,7 +455,7 @@ void move_block(Block *block, char dir)
 }
 
 Queue queue;
-u8 read_keys = 1;
+bool read_keys = 1;
 
 static void KeyPressedHandler(const char *pString)
 {
@@ -449,7 +467,7 @@ static void KeyPressedHandler(const char *pString)
       enqueue(&queue, ch);
 }
 
-u8 run()
+bool run()
 {
    Block current_block = create_tile();
 
@@ -470,8 +488,9 @@ u8 run()
       // Le teclas e move tile
       while (!isQueueEmpty(&queue))
       {
-         char ch = dequeue(&queue);
-         move_block(&current_block, ch);
+         char ch = dequeue(&queue);         
+         if (!check_horizontal_collision(current_block, ch)) 
+            move_block(&current_block, ch);         
       }
 
       usleep(speed);

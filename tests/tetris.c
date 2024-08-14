@@ -118,6 +118,7 @@ void *readFromKeyboard(void *arg)
 //    return NULL;
 // }
 
+// Trocar pela tela especificada na biblioteca USPi.
 #define WIDTH 800
 #define HEIGHT 600
 
@@ -377,8 +378,30 @@ bool check_collision(Block block)
    int(*rotation)[4] = get_rotation(block);
    for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++)
-         if (rotation[i][j] && grid[block.y + 1 + i][block.x + j] || (rotation[i][j] && block.y + 1 + i >= 20))
+         if (rotation[i][j] && (grid[block.y + 1 + i][block.x + j] || block.y + 1 + i >= 20))
             return true;
+   return false;
+}
+
+bool check_lateral_collision(int blockX, int blockY, int i, int j, char ch) {
+   return (ch == 'a') ? (blockX + j - 1 < 0 || grid[blockY + i][blockX + j - 1]) : 
+                        (blockX + 1 + j >= 10 || grid[blockY + i][blockX + j + 1]);
+}
+
+// The tile is not in the grid yet, so it does not collide with itself.
+bool check_horizontal_collision(Block block, char ch)
+{
+   // printf("Checking collision for char %c\n", ch);
+   int(*rotation)[4] = get_rotation(block);
+   
+   for (int i = 0; i < 4; i++) {      
+      for (int j = 0; j < 4; j++)
+         if (rotation[i][j] && check_lateral_collision(block.x, block.y, i, j, ch)) {
+            // printf("Collision left\n");
+            return true;
+         }
+   }      
+   
    return false;
 }
 
@@ -521,7 +544,15 @@ bool run()
       while (!isQueueEmpty(&queue))
       {
          char ch = dequeue(&queue);
-         move_block(&current_block, ch);
+         if (ch == 'w') {
+            printf("rotate: TO DO\n");
+         } else {
+            if (!check_horizontal_collision(current_block, ch)) {
+               move_block(&current_block, ch);
+            } else {
+               printf("cant move due to collision\n");
+            }        
+         }      
       }
 
       usleep(speed);
