@@ -9,8 +9,16 @@
 
 static const char FromSample[] = "sample";
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1280
+#define HEIGHT 800
+
+#define I_BLOCK_COLOR HIGH_COLOR // COLOR16(0, 31, 31) // Ciano
+#define O_BLOCK_COLOR HIGH_COLOR // COLOR16(31, 31, 0) // Amarelo
+#define T_BLOCK_COLOR HIGH_COLOR // COLOR16(16, 0, 16) // Roxo
+#define L_BLOCK_COLOR HIGH_COLOR // COLOR16(31, 20, 0) // Laranja
+#define J_BLOCK_COLOR HIGH_COLOR // COLOR16(0, 0, 31)  // Azul
+#define S_BLOCK_COLOR HIGH_COLOR // COLOR16(0, 31, 0)  // Verde
+#define Z_BLOCK_COLOR HIGH_COLOR // COLOR16(31, 0, 0)  // Vermelho
 
 const int BLOCK_SIZE = 16;
 
@@ -20,7 +28,7 @@ const int frame_height = 20 * BLOCK_SIZE;
 const int frame_thickness = 8;
 
 // (x, y) do canto superior esquerdo externo ao frame
-const int frame_pos_x = WIDTH / 2 - frame_width / 2 - frame_thickness;
+const int frame_pos_x = WIDTH / 2 - frame_width / 2 - frame_thickness + 400;
 const int frame_pos_y = HEIGHT / 2 - frame_height / 2 - frame_thickness;
 
 // (x, y) do canto superior esquerdo interno ao frame
@@ -28,7 +36,7 @@ const int grid_pos_x = frame_pos_x + frame_thickness;
 const int grid_pos_y = frame_pos_y + frame_thickness;
 
 unsigned grid[20][10] = {0};
-unsigned speed = 500000;
+unsigned speed = 50000;
 
 typedef struct
 {
@@ -42,8 +50,6 @@ typedef struct
    int rotation;
    int x, y;
 } Block;
-
-#define pack_color(r, g, b) 1 // (unsigned)((r << 16) | (g << 8) | b)
 
 // Blocks e as suas rotações
 BlockType block_types[] = {
@@ -64,8 +70,8 @@ BlockType block_types[] = {
        {1, 0, 0, 0},
        {1, 0, 0, 0},
        {1, 0, 0, 0}}},
-     pack_color(0, 255, 255)},
-    // O block
+     I_BLOCK_COLOR},
+    // O blockf
     {{{{1, 1, 0, 0},
        {1, 1, 0, 0},
        {0, 0, 0, 0},
@@ -82,7 +88,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {0, 0, 0, 0},
        {0, 0, 0, 0}}},
-     pack_color(255, 255, 0)},
+     O_BLOCK_COLOR},
     // T block
     {{{{0, 1, 0, 0},
        {1, 1, 1, 0},
@@ -100,7 +106,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 0, 0}}},
-     pack_color(128, 0, 128)},
+     T_BLOCK_COLOR},
     // L block
     {{{{0, 0, 1, 0},
        {1, 1, 1, 0},
@@ -118,7 +124,7 @@ BlockType block_types[] = {
        {0, 1, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 0, 0}}},
-     pack_color(255, 165, 0)},
+     L_BLOCK_COLOR},
     // J block
     {{{{1, 0, 0, 0},
        {1, 1, 1, 0},
@@ -136,7 +142,7 @@ BlockType block_types[] = {
        {0, 1, 0, 0},
        {1, 1, 0, 0},
        {0, 0, 0, 0}}},
-     pack_color(0, 0, 255)},
+     J_BLOCK_COLOR},
     // S block
     {{{{0, 1, 1, 0},
        {1, 1, 0, 0},
@@ -154,7 +160,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 0, 0}}},
-     pack_color(0, 255, 0)},
+     S_BLOCK_COLOR},
     // Z block
     {{{{1, 1, 0, 0},
        {0, 1, 1, 0},
@@ -172,7 +178,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {1, 0, 0, 0},
        {0, 0, 0, 0}}},
-     pack_color(255, 0, 0)}};
+     Z_BLOCK_COLOR}};
 
 #define QUEUE_SIZE 10
 
@@ -248,22 +254,20 @@ void draw_rect(int x, int y, int width, int height, int thickness, unsigned colo
 
 void draw_frame()
 {
-   unsigned white = 1;
-   draw_rect(frame_pos_x, frame_pos_y, frame_width, frame_height, frame_thickness, white);
+   draw_rect(frame_pos_x, frame_pos_y, frame_width, frame_height, frame_thickness, NORMAL_COLOR);
 }
 
 // usado para debugging
 void draw_grid()
 {
-   unsigned white = pack_color(255, 255, 255);
    for (int i = 0; i < 20; i++)
    {
       for (int j = 0; j < 10; j++)
       {
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE, white);
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE + BLOCK_SIZE - 1, grid_pos_y + i * BLOCK_SIZE, white);
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE + BLOCK_SIZE - 1, white);
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE + BLOCK_SIZE - 1, grid_pos_y + i * BLOCK_SIZE + BLOCK_SIZE - 1, white);
+         fb_pixel(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE, NORMAL_COLOR);
+         fb_pixel(grid_pos_x + j * BLOCK_SIZE + BLOCK_SIZE - 1, grid_pos_y + i * BLOCK_SIZE, NORMAL_COLOR);
+         fb_pixel(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE + BLOCK_SIZE - 1, NORMAL_COLOR);
+         fb_pixel(grid_pos_x + j * BLOCK_SIZE + BLOCK_SIZE - 1, grid_pos_y + i * BLOCK_SIZE + BLOCK_SIZE - 1, NORMAL_COLOR);
       }
    }
 }
@@ -278,9 +282,11 @@ void draw_square(int pos_x, int pos_y, unsigned color)
 
 // quadrado na posição (i, j) do frame
 // começa no canto superior esquerdo
-void draw_grid_square(int i, int j, unsigned color)
+void draw_grid_square(int j, int i, unsigned color)
 {
-   draw_square(grid_pos_x + i * BLOCK_SIZE, grid_pos_y + j * BLOCK_SIZE, color);
+   if ((i < 0 || i > 19) || (j < 0 || j > 9))
+      LogWrite(FromSample, LOG_ERROR, "não pode desenhar fora do grid: (i, j) = (%d, %d)", i, j);
+   draw_square(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE, color);
 }
 
 // desenha a tile completa
@@ -340,10 +346,10 @@ bool check_horizontal_collision(Block block, char ch)
 
 Block create_tile()
 {
-   static unsigned type = 0;
+   static unsigned type = 0, rot = 0;
    Block current_block;
    current_block.type = type++ % 7; // Random tile
-   current_block.rotation = 0;
+   current_block.rotation = rot++ % 4;
    current_block.x = 3; // Starting X position (middle of the frame)
    current_block.y = 0; // Starting Y position (top of the frame)
 
@@ -352,6 +358,9 @@ Block create_tile()
 
 void setup()
 {
+   // u32 width = BcmFrameBufferGetWidth(USPiEnvGetScreen()->m_pFrameBuffer);
+   // u32 height = BcmFrameBufferGetHeight(USPiEnvGetScreen()->m_pFrameBuffer);
+   // LogWrite(FromSample, LOG_NOTICE, "width = %d, height = %d", width, height);
    draw_frame();
    // draw_grid(); // debugging
 }
@@ -405,16 +414,14 @@ void save_to_grid(Block block)
 
    // aparentemente toda a lógica abaixo n ta correta ou o SDL que está bugando
 
+   // LogWrite(FromSample, LOG_ERROR, "Linhas completas: %d, A partid da linha: %d", cnt_full, first_full);
+
    // apaga linhas completas
    for (int i = 0; i < cnt_full; i++)
-   {
       for (int j = 0; j < 10; j++)
-      {
-         draw_grid_square(first_full + i, j, 0);
-      }
-   }
+         draw_grid_square(j, first_full + i, 0);
 
-   usleep(500000);
+   usleep(speed);
 
    // desce as linhas não completas uma a uma
    for (int cnt = 0; cnt < cnt_full; cnt++)
@@ -424,12 +431,12 @@ void save_to_grid(Block block)
          for (int j = 0; j < 10; j++)
          {
             grid[i + 1][j] = grid[i][j];
-            draw_grid_square(i, j, 0);
+            draw_grid_square(j, i, 0);
             if (grid[i + 1][j])
-               draw_grid_square(i + 1, j, grid[i + 1][j]);
+               draw_grid_square(j, i + 1, grid[i + 1][j]);
          }
       }
-      usleep(500000);
+      usleep(speed);
    }
 }
 
@@ -463,7 +470,7 @@ static void KeyPressedHandler(const char *pString)
    char ch = *pString++;
 
    // Caracteres validos
-   if (read_keys && (ch == 'w' || ch == 'a' || ch == 's' || ch == 'd'))
+   if (ch == 'w' || ch == 'a' || ch == 's' || ch == 'd')
       enqueue(&queue, ch);
 }
 
@@ -520,7 +527,8 @@ void start_game()
 
    // cada iteração spawna uma nova tile
    // sai do loop quando o jogador perde
-   while (run());
+   while (run())
+      ;
 
    end_game();
 }
