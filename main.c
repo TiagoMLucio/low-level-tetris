@@ -12,14 +12,6 @@ static const char FromSample[] = "sample";
 #define WIDTH 1280
 #define HEIGHT 800
 
-#define I_BLOCK_COLOR HIGH_COLOR // COLOR16(0, 31, 31) // Ciano
-#define O_BLOCK_COLOR HIGH_COLOR // COLOR16(31, 31, 0) // Amarelo
-#define T_BLOCK_COLOR HIGH_COLOR // COLOR16(16, 0, 16) // Roxo
-#define L_BLOCK_COLOR HIGH_COLOR // COLOR16(31, 20, 0) // Laranja
-#define J_BLOCK_COLOR HIGH_COLOR // COLOR16(0, 0, 31)  // Azul
-#define S_BLOCK_COLOR HIGH_COLOR // COLOR16(0, 31, 0)  // Verde
-#define Z_BLOCK_COLOR HIGH_COLOR // COLOR16(31, 0, 0)  // Vermelho
-
 const int BLOCK_SIZE = 16;
 
 // dimensões do frame
@@ -36,7 +28,7 @@ const int grid_pos_x = frame_pos_x + frame_thickness;
 const int grid_pos_y = frame_pos_y + frame_thickness;
 
 unsigned grid[20][10] = {0};
-unsigned speed = 50000;
+unsigned speed = 100000;
 
 typedef struct
 {
@@ -70,7 +62,7 @@ BlockType block_types[] = {
        {1, 0, 0, 0},
        {1, 0, 0, 0},
        {1, 0, 0, 0}}},
-     I_BLOCK_COLOR},
+     CYAN_PALETTE},
     // O blockf
     {{{{1, 1, 0, 0},
        {1, 1, 0, 0},
@@ -88,7 +80,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {0, 0, 0, 0},
        {0, 0, 0, 0}}},
-     O_BLOCK_COLOR},
+     YELLOW_PALETTE},
     // T block
     {{{{0, 1, 0, 0},
        {1, 1, 1, 0},
@@ -106,7 +98,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 0, 0}}},
-     T_BLOCK_COLOR},
+     PURPLE_PALETTE},
     // L block
     {{{{0, 0, 1, 0},
        {1, 1, 1, 0},
@@ -124,7 +116,7 @@ BlockType block_types[] = {
        {0, 1, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 0, 0}}},
-     L_BLOCK_COLOR},
+     ORANGE_PALETTE},
     // J block
     {{{{1, 0, 0, 0},
        {1, 1, 1, 0},
@@ -142,7 +134,7 @@ BlockType block_types[] = {
        {0, 1, 0, 0},
        {1, 1, 0, 0},
        {0, 0, 0, 0}}},
-     J_BLOCK_COLOR},
+     GREEN_PALETTE},
     // S block
     {{{{0, 1, 1, 0},
        {1, 1, 0, 0},
@@ -160,7 +152,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {0, 1, 0, 0},
        {0, 0, 0, 0}}},
-     S_BLOCK_COLOR},
+     BLUE_PALETTE},
     // Z block
     {{{{1, 1, 0, 0},
        {0, 1, 1, 0},
@@ -178,7 +170,7 @@ BlockType block_types[] = {
        {1, 1, 0, 0},
        {1, 0, 0, 0},
        {0, 0, 0, 0}}},
-     Z_BLOCK_COLOR}};
+     RED_PALETTE}};
 
 #define QUEUE_SIZE 10
 
@@ -341,30 +333,27 @@ u8 check_horizontal_collision(Block block, char ch)
    int(*rotation)[4] = get_rotation(block);
 
    for (int i = 0; i < 4; i++)
-   {
       for (int j = 0; j < 4; j++)
          if (rotation[i][j] && check_lateral_collision(block.x, block.y, i, j, ch))
             return 1;
-   }
 
    return 0;
 }
 
-u8 check_rotational_collision(int blockX, int blockY, int i, int j, char ch) {
-   return (blockX + j < 0 || blockX + j >= 10 || grid[blockY + i][blockX + j] || blockY + 1 + i >= 20);  
+u8 check_rotational_collision(int blockX, int blockY, int i, int j)
+{
+   return (blockX + j < 0 || blockX + j >= 10 || grid[blockY + i][blockX + j] || blockY + 1 + i >= 20);
 }
 
-u8 check_rotation_collision(Block block, char ch)
-{   
+u8 check_rotation_collision(Block block)
+{
    int(*next_rotation)[4] = get_next_rotation(block);
-   
-   for (int i = 0; i < 4; i++) {      
+
+   for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++)
-         if (next_rotation[i][j] && check_rotational_collision(block.x, block.y, i, j, ch)) {            
+         if (next_rotation[i][j] && check_rotational_collision(block.x, block.y, i, j))
             return 1;
-         }
-   }      
-   
+
    return 0;
 }
 
@@ -477,17 +466,32 @@ void end_game()
 // s: acelera a descida
 void move_block(Block *block, char dir)
 {
-   remove_block(*block);
+   switch (dir)
+   {
+   case 'd':
+   case 'a':
+      if (check_horizontal_collision(*block, dir))
+         return;
 
-   if (dir == 'd' || dir == 'a')
-   {      
-      block->x += dir == 'd' ? 1 : -1;      
-   } else if (dir == 'w') {
+      remove_block(*block);
+      block->x += dir == 'd' ? 1 : -1;
+      put_block(*block);
+      break;
+   case 'w':
+      if (check_rotation_collision(*block))
+         return;
+
+      remove_block(*block);
       block->rotation = (block->rotation + 1) % 4;
+      put_block(*block);
+      break;
+   case 's':
+      block->y++;
+      break;
+   default:
+      LogWrite(FromSample, LOG_ERROR, "Key not found in move_block()!");
+      break;
    }
-
-   put_block(*block);
-
 }
 
 Queue queue;
@@ -523,19 +527,7 @@ u8 run()
 
       // Le teclas e move tile
       while (!isQueueEmpty(&queue))
-      {
-         char ch = dequeue(&queue);
-         
-         if (ch == 'w') {            
-            if (!check_rotation_collision(current_block, ch)) {
-               move_block(&current_block, ch);
-            }
-         } else {
-            if (!check_horizontal_collision(current_block, ch)) {
-               move_block(&current_block, ch);
-            }     
-         }
-      }
+         move_block(&current_block, dequeue(&queue));
 
       usleep(speed);
 

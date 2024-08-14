@@ -49,10 +49,24 @@ extern "C" {
 	#define NORMAL_COLOR16			COLOR16 (31, 31, 31)
 	#define HIGH_COLOR16			COLOR16 (31, 0, 0)
 	#define HALF_COLOR16			COLOR16 (0, 0, 31)
+	#define CYAN_COLOR16    		COLOR16(0, 31, 31)  // Ciano
+	#define YELLOW_COLOR16  		COLOR16(31, 31, 0)  // Amarelo
+	#define PURPLE_COLOR16  		COLOR16(16, 0, 16)  // Roxo
+	#define ORANGE_COLOR16  		COLOR16(31, 20, 0)  // Laranja
+	#define BLUE_COLOR16    		COLOR16(0, 0, 31)   // Azul
+	#define GREEN_COLOR16   		COLOR16(0, 31, 0)   // Verde
+	#define RED_COLOR16     		COLOR16(31, 0, 0)   // Vermelho
 
 	#define NORMAL_COLOR			1
-	#define HIGH_COLOR			2
-	#define HALF_COLOR			3
+	#define HIGH_COLOR				2
+	#define HALF_COLOR				3
+	#define CYAN_PALETTE    		4
+	#define YELLOW_PALETTE  		5
+	#define PURPLE_PALETTE  		6
+	#define ORANGE_PALETTE  		7
+	#define BLUE_PALETTE    		8
+	#define GREEN_PALETTE   		9
+	#define RED_PALETTE     		10
 #elif DEPTH == 16
 	typedef u16 TScreenColor;
 
