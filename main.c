@@ -467,7 +467,6 @@ u8 read_keys = 1;
 
 static void KeyPressedHandler(const char *pString)
 {
-   ScreenDeviceWrite(USPiEnvGetScreen(), pString, strlen(pString));
    char ch = *pString++;
 
    // Caracteres validos
