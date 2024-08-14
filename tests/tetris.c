@@ -138,7 +138,8 @@ const int grid_pos_x = frame_pos_x + frame_thickness;
 const int grid_pos_y = frame_pos_y + frame_thickness;
 
 unsigned grid[20][10] = {0};
-unsigned speed = 100000;
+// unsigned speed = 100000;
+unsigned speed = 500000;
 
 SDL_Renderer *renderer;
 
@@ -372,6 +373,11 @@ int (*get_rotation(Block block))[4]
    return block_types[block.type].rotations[block.rotation];
 }
 
+int (*get_next_rotation(Block block))[4]
+{
+   return block_types[block.type].rotations[(block.rotation + 1) % 4];
+}
+
 bool check_collision(Block block)
 {
    printf("Checking collision\n");
@@ -398,6 +404,27 @@ bool check_horizontal_collision(Block block, char ch)
       for (int j = 0; j < 4; j++)
          if (rotation[i][j] && check_lateral_collision(block.x, block.y, i, j, ch)) {
             // printf("Collision left\n");
+            return true;
+         }
+   }      
+   
+   return false;
+}
+
+// checar blockX e blockY?
+bool check_rotational_collision(int blockX, int blockY, int i, int j, char ch) {
+   return (blockX + j < 0 || blockX + j >= 10 || grid[blockY + i][blockX + j] || blockY + 1 + i >= 20);  
+}
+
+bool check_rotation_collision(Block block, char ch)
+{
+   printf("Checking collision for char %c\n", ch);
+   int(*next_rotation)[4] = get_next_rotation(block);
+   
+   for (int i = 0; i < 4; i++) {      
+      for (int j = 0; j < 4; j++)
+         if (next_rotation[i][j] && check_rotational_collision(block.x, block.y, i, j, ch)) {
+            printf("Collision rotation\n");
             return true;
          }
    }      
@@ -513,15 +540,20 @@ void end_game()
 // s: acelera a descida
 void move_block(Block *block, char dir)
 {
+   remove_block(*block);
+
    if (dir == 'd' || dir == 'a')
-   {
-      remove_block(*block);
-      block->x += dir == 'd' ? 1 : -1;
-      put_block(*block);
+   {      
+      block->x += dir == 'd' ? 1 : -1;      
+   } else if (dir == 'w') {
+      block->rotation = (block->rotation + 1) % 4;
    }
+
+   put_block(*block);
+
 }
 
-bool run()
+int run()
 {
    Block current_block = create_tile();
    SDL_RenderPresent(renderer); // remover para rpi
@@ -544,13 +576,13 @@ bool run()
       while (!isQueueEmpty(&queue))
       {
          char ch = dequeue(&queue);
-         if (ch == 'w') {
-            printf("rotate: TO DO\n");
+         if (ch == 'w') {            
+            if (!check_rotation_collision(current_block, ch)) {
+               move_block(&current_block, ch);
+            }
          } else {
             if (!check_horizontal_collision(current_block, ch)) {
                move_block(&current_block, ch);
-            } else {
-               printf("cant move due to collision\n");
             }        
          }      
       }
@@ -575,7 +607,7 @@ bool run()
    }
 }
 
-void *game(void *arg)
+void *game(void *arg) 
 {
    srand(time(NULL)); // configura seed do rand
 

@@ -316,6 +316,11 @@ int (*get_rotation(Block block))[4]
    return block_types[block.type].rotations[block.rotation];
 }
 
+int (*get_next_rotation(Block block))[4]
+{
+   return block_types[block.type].rotations[(block.rotation + 1) % 4];
+}
+
 u8 check_collision(Block block)
 {
    int(*rotation)[4] = get_rotation(block);
@@ -342,6 +347,24 @@ u8 check_horizontal_collision(Block block, char ch)
             return 1;
    }
 
+   return 0;
+}
+
+u8 check_rotational_collision(int blockX, int blockY, int i, int j, char ch) {
+   return (blockX + j < 0 || blockX + j >= 10 || grid[blockY + i][blockX + j] || blockY + 1 + i >= 20);  
+}
+
+u8 check_rotation_collision(Block block, char ch)
+{   
+   int(*next_rotation)[4] = get_next_rotation(block);
+   
+   for (int i = 0; i < 4; i++) {      
+      for (int j = 0; j < 4; j++)
+         if (next_rotation[i][j] && check_rotational_collision(block.x, block.y, i, j, ch)) {            
+            return 1;
+         }
+   }      
+   
    return 0;
 }
 
@@ -454,12 +477,17 @@ void end_game()
 // s: acelera a descida
 void move_block(Block *block, char dir)
 {
+   remove_block(*block);
+
    if (dir == 'd' || dir == 'a')
-   {
-      remove_block(*block);
-      block->x += dir == 'd' ? 1 : -1;
-      put_block(*block);
+   {      
+      block->x += dir == 'd' ? 1 : -1;      
+   } else if (dir == 'w') {
+      block->rotation = (block->rotation + 1) % 4;
    }
+
+   put_block(*block);
+
 }
 
 Queue queue;
@@ -497,8 +525,16 @@ u8 run()
       while (!isQueueEmpty(&queue))
       {
          char ch = dequeue(&queue);
-         if (!check_horizontal_collision(current_block, ch))
-            move_block(&current_block, ch);
+         
+         if (ch == 'w') {            
+            if (!check_rotation_collision(current_block, ch)) {
+               move_block(&current_block, ch);
+            }
+         } else {
+            if (!check_horizontal_collision(current_block, ch)) {
+               move_block(&current_block, ch);
+            }     
+         }
       }
 
       usleep(speed);
