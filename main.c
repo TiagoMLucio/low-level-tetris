@@ -29,6 +29,8 @@ const int grid_pos_y = frame_pos_y + frame_thickness;
 
 unsigned grid[20][10] = {0};
 unsigned speed = 100000;
+unsigned gameLevel = 0;
+unsigned remainingClosedLines = 0;
 
 typedef struct
 {
@@ -427,7 +429,8 @@ void save_to_grid(Block block)
 
    // aparentemente toda a lógica abaixo n ta correta ou o SDL que está bugando
 
-   // LogWrite(FromGame, LOG_ERROR, "Linhas completas: %d, A partid da linha: %d", cnt_full, first_full);
+   // LogWrite(FromSample, LOG_ERROR, "Linhas completas: %d, A partid da linha: %d", cnt_full, first_full);
+   remainingClosedLines += cnt_full;
 
    // apaga linhas completas
    for (int i = 0; i < cnt_full; i++)
@@ -535,6 +538,13 @@ u8 run()
       {
          // salva no grid e verifica/opera linhas completas
          save_to_grid(current_block);
+
+         while(remainingClosedLines >= 10) {
+            speed = (19 * speed) / 20;
+            remainingClosedLines -= 10; 
+            gameLevel++;
+         }
+         
          return 1; // proxima tile
       }
 

@@ -140,6 +140,8 @@ const int grid_pos_y = frame_pos_y + frame_thickness;
 unsigned grid[20][10] = {0};
 // unsigned speed = 100000;
 unsigned speed = 500000;
+unsigned gameLevel = 0;
+unsigned remainingClosedLines = 0;
 
 SDL_Renderer *renderer;
 
@@ -494,8 +496,8 @@ void save_to_grid(Block block)
    printf("Block saved to grid\n");
    printf("%d lines cleared\n", cnt_full);
    printf("First line cleared is: %d\n", first_full);
-
-   // aparentemente toda a lógica abaixo n ta correta ou o SDL que está bugando
+   
+   remainingClosedLines += cnt_full;
 
    // apaga linhas completas
    for (int i = 0; i < cnt_full; i++)
@@ -594,6 +596,17 @@ int run()
       {
          // salva no grid e verifica/opera linhas completas
          save_to_grid(current_block);
+         
+         while(remainingClosedLines >= 10) {
+            speed = (19 * speed) / 20;
+            remainingClosedLines -= 10; 
+            gameLevel++;
+         }
+
+         printf("new speed is: %d\n", speed);
+         printf("remainingClosedLines: %d \n", remainingClosedLines);
+         printf("tenTimesLevel: %d", gameLevel);
+         
          return true; // proxima tile
       }
 
