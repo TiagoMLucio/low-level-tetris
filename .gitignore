@@ -1,5 +1,7 @@
 .vscode
 *.o
+*.a
+!uspi/lib/**/*.a
 *.elf
 *.lst
 *.img
