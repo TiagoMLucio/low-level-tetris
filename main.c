@@ -27,7 +27,7 @@ const int grid_pos_x = frame_pos_x + frame_thickness;
 const int grid_pos_y = frame_pos_y + frame_thickness;
 
 unsigned grid[20][10] = {0};
-unsigned speed = 100000;
+unsigned speed = 500000;
 
 typedef struct
 {
@@ -314,8 +314,9 @@ u8 check_collision(Block block)
    int(*rotation)[4] = get_rotation(block);
    for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++)
-         if ((rotation[i][j] && grid[block.y + 1 + i][block.x + j]) || (rotation[i][j] && block.y + 1 + i >= 20))
-            return 1;
+         if (rotation[i][j])
+            if (grid[block.y + 1 + i][block.x + j] || block.y + 1 + i >= 20)
+               return 1;
    return 0;
 }
 
@@ -323,8 +324,8 @@ Block create_tile()
 {
    static unsigned type = 0;
    Block current_block;
-   current_block.type = 1; // Random tile
-   current_block.rotation = type % 7;
+   current_block.type = type++ % 7; // Random tile
+   current_block.rotation = 0;
    current_block.x = 3; // Starting X position (middle of the frame)
    current_block.y = 0; // Starting Y position (top of the frame)
 
@@ -337,14 +338,10 @@ void setup()
    // draw_grid(); // debugging
 }
 
-int cnt;
-
 void usleep(unsigned delay)
 {
-   for (int i = 0; i < 200 * delay; i++)
-   {
-      cnt++;
-   }
+   for (int i = 0; i < 250 * delay; i++)
+      asm volatile("nop" ::);
 }
 
 // salva no grid quando tile colide
@@ -421,6 +418,7 @@ void save_to_grid(Block block)
 // quando o jogador perde
 void end_game()
 {
+   LogWrite(FromSample, LOG_ERROR, "Game ended!");
 }
 
 // realiza operação de teclado no tile atual
@@ -444,17 +442,6 @@ u8 read_keys = 1;
 static void KeyPressedHandler(const char *pString)
 {
    ScreenDeviceWrite(USPiEnvGetScreen(), pString, strlen(pString));
-   static unsigned posx = 1;
-   for (int i = 0; i < 20; i++)
-   {
-      for (int j = 0; j < 20; j++)
-      {
-         ScreenDeviceSetPixel(USPiEnvGetScreen(), posx + i, 200 + j, HIGH_COLOR);
-      }
-   }
-
-   posx += 20;
-
    char ch = *pString++;
 
    // Caracteres validos
@@ -514,8 +501,7 @@ void start_game()
 
    // cada iteração spawna uma nova tile
    // sai do loop quando o jogador perde
-   while (run())
-      ;
+   while (run());
 
    end_game();
 }
@@ -551,19 +537,7 @@ int main(void)
 
    LogWrite(FromSample, LOG_NOTICE, "Just type something!");
 
-   // just wait and turn the rotor
-   // for (unsigned nCount = 0; 1; nCount++)
-   // {
-
-   // 	setup();
-
-   // 	// USPiKeyboardUpdateLEDs();
-   // 	// ScreenDeviceRotor(USPiEnvGetScreen(), 0, nCount);
-   // }
-
    start_game();
-
-   LogWrite(FromSample, LOG_ERROR, "Game ended!");
 
    for (unsigned nCount = 0; 1; nCount++)
    {
