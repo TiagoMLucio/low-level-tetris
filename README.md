@@ -31,3 +31,22 @@ To remove all the generated files:
 ```bash
 ./makeall clean
 ```
+
+## Logging
+
+The USPi driver contains logging on the initialization of the driver, showing relevant messages related to the keyboard integration. 
+
+For example, for a successful connection:
+
+![Successful connection: USPi library successfully initialized](./imgs/keyboard_found.jpeg)
+
+By default, we left logging disabled. If it is wanted to enable the logging, the makeall command should be the following:
+
+```bash
+./makeall LOGGING=1 DEBUG=1 
+```
+
+Or, for the Raspberry Pi 3:
+```bash
+./makeall RASPPI=3 LOGGING=1 DEBUG=1 
+```

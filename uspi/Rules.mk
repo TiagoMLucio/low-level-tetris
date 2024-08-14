@@ -31,8 +31,8 @@ endif
 RASPPI	?= 2
 AARCH64 ?= 0
 PREFIX	?= arm-none-eabi-
-DEBUG   ?= 1
-LOGGING ?= 1
+DEBUG   ?= 0
+LOGGING ?= 0
 
 CC	= $(PREFIX)gcc
 AS	= $(CC)
