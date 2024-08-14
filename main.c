@@ -1,465 +1,159 @@
-//
-// main.c
-//
-// #include <stdu8.h>
 #include <uspienv.h>
 #include <uspi.h>
 #include <uspios.h>
 #include <uspienv/util.h>
+#include "queue.h"
+#include "frame.h"
+#include "tile.h"
 
 static const char FromGame[] = "tetris";
 
-#define WIDTH 1280
-#define HEIGHT 800
+const unsigned LINES_PER_LEVEL = 4;
+const unsigned CYCLES_PER_MICRO_SECOND = 250;
 
-const int BLOCK_SIZE = 16;
+unsigned grid[FRAME_HEIGHT][FRAME_WIDTH] = {0};
+unsigned delay = 75000; // micro seconds
+unsigned gameLevel = 1;
+unsigned cur_closed_lines = 0;
 
-// dimensões do frame
-const int frame_width = 10 * BLOCK_SIZE;
-const int frame_height = 20 * BLOCK_SIZE;
-const int frame_thickness = 8;
+Queue queue;
 
-// (x, y) do canto superior esquerdo externo ao frame
-const int frame_pos_x = WIDTH / 2 - frame_width / 2 - frame_thickness + 400;
-const int frame_pos_y = HEIGHT / 2 - frame_height / 2 - frame_thickness;
-
-// (x, y) do canto superior esquerdo interno ao frame
-const int grid_pos_x = frame_pos_x + frame_thickness;
-const int grid_pos_y = frame_pos_y + frame_thickness;
-
-unsigned grid[20][10] = {0};
-unsigned speed = 100000;
-unsigned gameLevel = 0;
-unsigned remainingClosedLines = 0;
-
-typedef struct
+void usleep(unsigned delay)
 {
-   int rotations[4][4][4];
-   unsigned color;
-} BlockType;
-
-typedef struct
-{
-   int type;
-   int rotation;
-   int x, y;
-} Block;
-
-// Blocks e as suas rotações
-BlockType block_types[] = {
-    // I block
-    {{{{1, 1, 1, 1},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 0, 0, 0},
-       {1, 0, 0, 0},
-       {1, 0, 0, 0},
-       {1, 0, 0, 0}},
-      {{1, 1, 1, 1},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 0, 0, 0},
-       {1, 0, 0, 0},
-       {1, 0, 0, 0},
-       {1, 0, 0, 0}}},
-     CYAN_PALETTE},
-    // O blockf
-    {{{{1, 1, 0, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 0, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 0, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 0, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}}},
-     YELLOW_PALETTE},
-    // T block
-    {{{{0, 1, 0, 0},
-       {1, 1, 1, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 0, 0, 0},
-       {1, 1, 0, 0},
-       {1, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 1, 0},
-       {0, 1, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{0, 1, 0, 0},
-       {1, 1, 0, 0},
-       {0, 1, 0, 0},
-       {0, 0, 0, 0}}},
-     PURPLE_PALETTE},
-    // L block
-    {{{{0, 0, 1, 0},
-       {1, 1, 1, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 0, 0, 0},
-       {1, 0, 0, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 1, 0},
-       {1, 0, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 0, 0},
-       {0, 1, 0, 0},
-       {0, 1, 0, 0},
-       {0, 0, 0, 0}}},
-     ORANGE_PALETTE},
-    // J block
-    {{{{1, 0, 0, 0},
-       {1, 1, 1, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 0, 0},
-       {1, 0, 0, 0},
-       {1, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 1, 0},
-       {0, 0, 1, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{0, 1, 0, 0},
-       {0, 1, 0, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0}}},
-     GREEN_PALETTE},
-    // S block
-    {{{{0, 1, 1, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 0, 0, 0},
-       {1, 1, 0, 0},
-       {0, 1, 0, 0},
-       {0, 0, 0, 0}},
-      {{0, 1, 1, 0},
-       {1, 1, 0, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 0, 0, 0},
-       {1, 1, 0, 0},
-       {0, 1, 0, 0},
-       {0, 0, 0, 0}}},
-     BLUE_PALETTE},
-    // Z block
-    {{{{1, 1, 0, 0},
-       {0, 1, 1, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{0, 1, 0, 0},
-       {1, 1, 0, 0},
-       {1, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{1, 1, 0, 0},
-       {0, 1, 1, 0},
-       {0, 0, 0, 0},
-       {0, 0, 0, 0}},
-      {{0, 1, 0, 0},
-       {1, 1, 0, 0},
-       {1, 0, 0, 0},
-       {0, 0, 0, 0}}},
-     RED_PALETTE}};
-
-#define QUEUE_SIZE 10
-
-typedef struct
-{
-   char data[QUEUE_SIZE];
-   int front;
-   int rear;
-   int size;
-} Queue;
-
-// Initialize the queue
-void initQueue(Queue *q)
-{
-   q->front = 0;
-   q->rear = 0;
-   q->size = 0;
+   for (int i = 0; i < CYCLES_PER_MICRO_SECOND * delay; i++)
+      asm volatile("nop" ::);
 }
 
-// Check if the queue is empty
-int isQueueEmpty(Queue *q)
+boolean validTetrisChar(char c)
 {
-   return q->size == 0;
+   return c == 'w' || c == 'a' || c == 's' || c == 'd';
 }
 
-// Check if the queue is full
-int isQueueFull(Queue *q)
+static void KeyPressedHandler(const char *pString)
 {
-   return q->size == QUEUE_SIZE;
+   char c = *pString++;
+
+   // Caracteres validos
+   if (validTetrisChar(c))
+      enqueue(&queue, c);
 }
 
-// Enqueue an element
-void enqueue(Queue *q, char item)
+boolean check_collision(Tile tile)
 {
-   if (isQueueFull(q))
-      return;
-
-   q->data[q->rear] = item;
-   q->rear = (q->rear + 1) % QUEUE_SIZE;
-   q->size++;
+   int(*rotation)[ROTATION_GRID_SIZE] = get_rotation(tile);
+   for (int i = 0; i < ROTATION_GRID_SIZE; i++)
+      for (int j = 0; j < ROTATION_GRID_SIZE; j++)
+         if (rotation[i][j] && (grid[tile.y + 1 + i][tile.x + j] || tile.y + 1 + i >= FRAME_HEIGHT))
+            return TRUE;
+   return FALSE;
 }
 
-// Dequeue an element
-char dequeue(Queue *q)
+boolean check_lateral_collision(int tileX, int tileY, int i, int j, char ch)
 {
-   if (isQueueEmpty(q))
-      return '\0';
-   char item = q->data[q->front];
-   q->front = (q->front + 1) % QUEUE_SIZE;
-   q->size--;
-   return item;
+   return (ch == 'a') ? (tileX + j - 1 < 0 || grid[tileY + i][tileX + j - 1]) : (tileX + 1 + j >= 10 || grid[tileY + i][tileX + j + 1]);
 }
 
-void fb_pixel(int x, int y, unsigned color)
+boolean check_horizontal_collision(Tile tile, char ch)
 {
-   ScreenDeviceSetPixel(USPiEnvGetScreen(), x, y, color);
+   int(*rotation)[ROTATION_GRID_SIZE] = get_rotation(tile);
+
+   for (int i = 0; i < ROTATION_GRID_SIZE; i++)
+      for (int j = 0; j < ROTATION_GRID_SIZE; j++)
+         if (rotation[i][j] && check_lateral_collision(tile.x, tile.y, i, j, ch))
+            return TRUE;
+
+   return FALSE;
 }
 
-void draw_line(int x, int y, int length, unsigned color, int thickness, u8 vertical)
+boolean check_rotational_collision(int tileX, int tileY, int i, int j)
 {
-   for (int i = 0; i < thickness; i++)
-      for (int j = 0; j < length; j++)
-         fb_pixel(x + (vertical ? i : j), y + (vertical ? j : i), color);
+   return (tileX + j < 0 || tileX + j >= FRAME_WIDTH || grid[tileY + i][tileX + j] || tileY + 1 + i >= FRAME_HEIGHT);
 }
 
-void draw_rect(int x, int y, int width, int height, int thickness, unsigned color)
+boolean check_rotation_collision(Tile tile)
 {
-   draw_line(x, y, height + 2 * thickness, color, thickness, 1);                     // left
-   draw_line(x + width + thickness, y, height + 2 * thickness, color, thickness, 1); // right
-   draw_line(x, y, width + 2 * thickness, color, thickness, 0);                      // top
-   draw_line(x, y + height + thickness, width + 2 * thickness, color, thickness, 0); // bottom
-}
+   int(*next_rotation)[ROTATION_GRID_SIZE] = get_next_rotation(tile);
 
-void draw_frame()
-{
-   draw_rect(frame_pos_x, frame_pos_y, frame_width, frame_height, frame_thickness, NORMAL_COLOR);
-}
+   for (int i = 0; i < ROTATION_GRID_SIZE; i++)
+      for (int j = 0; j < ROTATION_GRID_SIZE; j++)
+         if (next_rotation[i][j] && check_rotational_collision(tile.x, tile.y, i, j))
+            return TRUE;
 
-// usado para debugging
-void draw_grid()
-{
-   for (int i = 0; i < 20; i++)
-   {
-      for (int j = 0; j < 10; j++)
-      {
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE, NORMAL_COLOR);
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE + BLOCK_SIZE - 1, grid_pos_y + i * BLOCK_SIZE, NORMAL_COLOR);
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE + BLOCK_SIZE - 1, NORMAL_COLOR);
-         fb_pixel(grid_pos_x + j * BLOCK_SIZE + BLOCK_SIZE - 1, grid_pos_y + i * BLOCK_SIZE + BLOCK_SIZE - 1, NORMAL_COLOR);
-      }
-   }
-}
-
-// quadrado do tamanho BLOCK_SIZE
-void draw_square(int pos_x, int pos_y, unsigned color)
-{
-   for (int i = 0; i < BLOCK_SIZE; i++)
-      for (int j = 0; j < BLOCK_SIZE; j++)
-         fb_pixel(pos_x + i, pos_y + j, color);
-}
-
-// quadrado na posição (i, j) do frame
-// começa no canto superior esquerdo
-void draw_grid_square(int j, int i, unsigned color)
-{
-   if ((i < 0 || i > 19) || (j < 0 || j > 9))
-      LogWrite(FromGame, LOG_ERROR, "não pode desenhar fora do grid: (i, j) = (%d, %d)", i, j);
-   draw_square(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE, color);
-}
-
-// desenha a tile completa
-void draw_block(Block block, unsigned color)
-{
-   BlockType type = block_types[block.type];
-   int(*rotation)[4] = type.rotations[block.rotation];
-
-   for (int i = 0; i < 4; i++)
-      for (int j = 0; j < 4; j++)
-         if (rotation[i][j])
-            draw_grid_square(block.x + j, block.y + i, color);
-}
-
-void put_block(Block block)
-{
-   draw_block(block, block_types[block.type].color);
-}
-
-void remove_block(Block block)
-{
-   draw_block(block, 0);
-}
-
-int (*get_rotation(Block block))[4]
-{
-   return block_types[block.type].rotations[block.rotation];
-}
-
-int (*get_next_rotation(Block block))[4]
-{
-   return block_types[block.type].rotations[(block.rotation + 1) % 4];
-}
-
-u8 check_collision(Block block)
-{
-   int(*rotation)[4] = get_rotation(block);
-   for (int i = 0; i < 4; i++)
-      for (int j = 0; j < 4; j++)
-         if (rotation[i][j] && (grid[block.y + 1 + i][block.x + j] || block.y + 1 + i >= 20))
-            return 1;
-   return 0;
-}
-
-u8 check_lateral_collision(int blockX, int blockY, int i, int j, char ch)
-{
-   return (ch == 'a') ? (blockX + j - 1 < 0 || grid[blockY + i][blockX + j - 1]) : (blockX + 1 + j >= 10 || grid[blockY + i][blockX + j + 1]);
-}
-
-u8 check_horizontal_collision(Block block, char ch)
-{
-   int(*rotation)[4] = get_rotation(block);
-
-   for (int i = 0; i < 4; i++)
-      for (int j = 0; j < 4; j++)
-         if (rotation[i][j] && check_lateral_collision(block.x, block.y, i, j, ch))
-            return 1;
-
-   return 0;
-}
-
-u8 check_rotational_collision(int blockX, int blockY, int i, int j)
-{
-   return (blockX + j < 0 || blockX + j >= 10 || grid[blockY + i][blockX + j] || blockY + 1 + i >= 20);
-}
-
-u8 check_rotation_collision(Block block)
-{
-   int(*next_rotation)[4] = get_next_rotation(block);
-
-   for (int i = 0; i < 4; i++)
-      for (int j = 0; j < 4; j++)
-         if (next_rotation[i][j] && check_rotational_collision(block.x, block.y, i, j))
-            return 1;
-
-   return 0;
-}
-
-Block create_tile()
-{
-   static unsigned type = 0, rot = 0;
-   Block current_block;
-   current_block.type = type++ % 7; // Random tile
-   current_block.rotation = rot++ % 4;
-   current_block.x = 3; // Starting X position (middle of the frame)
-   current_block.y = 0; // Starting Y position (top of the frame)
-
-   return current_block;
+   return FALSE;
 }
 
 void setup()
 {
-   // u32 width = BcmFrameBufferGetWidth(USPiEnvGetScreen()->m_pFrameBuffer);
-   // u32 height = BcmFrameBufferGetHeight(USPiEnvGetScreen()->m_pFrameBuffer);
-   // LogWrite(FromGame, LOG_NOTICE, "width = %d, height = %d", width, height);
    draw_frame();
    // draw_grid(); // debugging
 }
 
-void usleep(unsigned delay)
-{
-   for (int i = 0; i < 250 * delay; i++)
-      asm volatile("nop" ::);
-}
-
 // salva no grid quando tile colide
-void save_to_grid(Block block)
+void save_to_grid(Tile tile)
 {
-   BlockType type = block_types[block.type];
-   int(*rotation)[4] = get_rotation(block);
+   TileType type = TILE_TYPES[tile.type];
+   int(*rotation)[ROTATION_GRID_SIZE] = get_rotation(tile);
    unsigned color = type.color;
 
-   int first_full = -1, cnt_full = 0;
+   int full_lines[4];
+   int cnt_full = 0;
 
-   // verifica qual é a primeira linha completa e quantas completaram
-   // não verifica quando ele completa linhas de forma descontínua (linhas 16, 17 e 19 por exemplo)
-   for (int i = 0; i < 4 && block.y + i < 20; i++)
+   // verifica quais linhas completaram
+   for (int i = 0; i < ROTATION_GRID_SIZE && tile.y + i < FRAME_HEIGHT; i++)
    {
-      u8 addedToLine = 0;
-      for (int j = 0; j < 4; j++)
+      boolean added_to_line = 0;
+      for (int j = 0; j < ROTATION_GRID_SIZE; j++)
       {
-         if (block.x + j < 10 && rotation[i][j])
+         if (tile.x + j < FRAME_WIDTH && rotation[i][j])
          {
-            grid[block.y + i][block.x + j] = rotation[i][j] ? color : 0;
-            addedToLine = 1;
+            grid[tile.y + i][tile.x + j] = rotation[i][j] ? color : 0;
+            added_to_line = 1;
          }
       }
-      if (addedToLine)
+      if (added_to_line)
       {
 
-         u8 full_line = 1;
-         for (int j = 0; j < 10; j++)
-         {
-            if (!grid[block.y + i][j])
-               full_line = 0;
-         }
+         boolean full_line = TRUE;
+         for (int j = 0; j < FRAME_WIDTH; j++)
+            if (!grid[tile.y + i][j])
+               full_line = FALSE;
 
          if (full_line)
-         {
-            if (first_full == -1)
-               first_full = block.y + i;
-            cnt_full++;
-         }
+            full_lines[cnt_full++] = tile.y + i;
       }
    }
 
-   // aparentemente toda a lógica abaixo n ta correta ou o SDL que está bugando
-
-   // LogWrite(FromSample, LOG_ERROR, "Linhas completas: %d, A partid da linha: %d", cnt_full, first_full);
-   remainingClosedLines += cnt_full;
+   if (cnt_full > 0)
+      LogWrite(FromGame, LOG_DEBUG, "Linhas completas: %d", cnt_full);
+   cur_closed_lines += cnt_full;
 
    // apaga linhas completas
    for (int i = 0; i < cnt_full; i++)
-      for (int j = 0; j < 10; j++)
-         draw_grid_square(j, first_full + i, 0);
+      delete_line(full_lines[i]);
 
-   usleep(speed);
+   usleep(delay);
 
    // desce as linhas não completas uma a uma
    for (int cnt = 0; cnt < cnt_full; cnt++)
    {
-      for (int i = first_full + cnt - 1; i >= cnt; i--)
+      for (int i = full_lines[cnt] - 1; i >= cnt; i--)
       {
-         for (int j = 0; j < 10; j++)
+         for (int j = 0; j < FRAME_WIDTH; j++)
          {
             grid[i + 1][j] = grid[i][j];
-            draw_grid_square(j, i, 0);
+            draw_grid_block(j, i, 0);
             if (grid[i + 1][j])
-               draw_grid_square(j, i + 1, grid[i + 1][j]);
+               draw_grid_block(j, i + 1, grid[i + 1][j]);
          }
       }
-      usleep(speed);
+      usleep(delay);
    }
 }
 
 // quando o jogador perde
 void end_game()
 {
-   LogWrite(FromGame, LOG_ERROR, "Game ended!");
+   LogWrite(FromGame, LOG_DEBUG, "Game ended!");
 }
 
 // realiza operação de teclado no tile atual
@@ -467,92 +161,78 @@ void end_game()
 // a: esqueda
 // w: rotação
 // s: acelera a descida
-void move_block(Block *block, char dir)
+void move_tile(Tile *tile, char dir)
 {
    switch (dir)
    {
    case 'd':
    case 'a':
-      if (check_horizontal_collision(*block, dir))
+      if (check_horizontal_collision(*tile, dir))
          return;
 
-      remove_block(*block);
-      block->x += dir == 'd' ? 1 : -1;
-      put_block(*block);
+      remove_tile(*tile);
+      tile->x += dir == 'd' ? 1 : -1;
+      put_tile(*tile);
       break;
    case 'w':
-      if (check_rotation_collision(*block))
+      if (check_rotation_collision(*tile))
          return;
 
-      remove_block(*block);
-      block->rotation = (block->rotation + 1) % 4;
-      put_block(*block);
+      remove_tile(*tile);
+      tile->rotation = (tile->rotation + 1) % 4;
+      put_tile(*tile);
       break;
    case 's':
-      block->y++;
+      tile->y++;
       break;
    default:
-      LogWrite(FromGame, LOG_ERROR, "Key not found in move_block()!");
+      LogWrite(FromGame, LOG_ERROR, "Key not found in move_tile()!");
       break;
    }
 }
 
-Queue queue;
-u8 read_keys = 1;
-
-static void KeyPressedHandler(const char *pString)
+boolean run()
 {
-   char ch = *pString++;
+   Tile tile = create_tile();
 
-   // Caracteres validos
-   if (ch == 'w' || ch == 'a' || ch == 's' || ch == 'd')
-      enqueue(&queue, ch);
-}
+   if (check_collision(tile)) // colidiu antes de spawnar
+      return FALSE;           // finaliza o jogo
 
-u8 run()
-{
-   Block current_block = create_tile();
-
-   if (check_collision(current_block)) // colidiu antes de spawnar
-      return 0;                        // finaliza o jogo
-
-   put_block(current_block); // spawna nova tile
+   put_tile(tile); // spawna nova tile
 
    // uma iteração por movimento vertical da nova tile
    while (1)
    {
-      read_keys = 1; // habilita leitura do teclado
-
-      usleep(speed);
-
-      read_keys = 0; // desabilita leitura do teclado
+      usleep(delay);
 
       // Le teclas e move tile
       while (!isQueueEmpty(&queue))
-         move_block(&current_block, dequeue(&queue));
+         move_tile(&tile, dequeue(&queue));
 
-      usleep(speed);
+      usleep(delay);
 
       // quando a tile colide no final do frame ou com outra tile
-      if (check_collision(current_block))
+      if (check_collision(tile))
       {
          // salva no grid e verifica/opera linhas completas
-         save_to_grid(current_block);
+         save_to_grid(tile);
 
-         while(remainingClosedLines >= 10) {
-            speed = (19 * speed) / 20;
-            remainingClosedLines -= 10; 
+         if (cur_closed_lines >= LINES_PER_LEVEL)
+         {
+            delay = (19 * delay) / 20;
+            cur_closed_lines = 0;
             gameLevel++;
+            LogWrite(FromGame, LOG_DEBUG, "Level %d", gameLevel);
          }
-         
-         return 1; // proxima tile
+
+         return TRUE; // proxima tile
       }
 
       // quando não colide, move a tile 1 para baixo
 
-      remove_block(current_block);
-      current_block.y++;
-      put_block(current_block);
+      remove_tile(tile);
+      tile.y++;
+      put_tile(tile);
    }
 }
 
@@ -561,7 +241,7 @@ void start_game()
    // srand(time(0)); // configura seed do rand
 
    setup(); // antes de adicionar as tiles
-   usleep(2 * speed);
+   usleep(2 * delay);
 
    // cada iteração spawna uma nova tile
    // sai do loop quando o jogador perde
@@ -574,9 +254,7 @@ void start_game()
 int main(void)
 {
    if (!USPiEnvInitialize())
-   {
       return EXIT_HALT;
-   }
 
    if (!USPiInitialize())
    {
@@ -600,16 +278,7 @@ int main(void)
 
    USPiKeyboardRegisterKeyPressedHandler(KeyPressedHandler);
 
-   LogWrite(FromGame, LOG_NOTICE, "Just type something!");
-
    start_game();
-
-   for (unsigned nCount = 0; 1; nCount++)
-   {
-      USPiKeyboardUpdateLEDs();
-
-      ScreenDeviceRotor(USPiEnvGetScreen(), 0, nCount);
-   }
 
    return EXIT_HALT;
 }

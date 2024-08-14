@@ -4,7 +4,7 @@
 
 USPIHOME = ./uspi
 
-OBJS = main.o
+OBJS = queue.o graphics.o frame.o tile.o main.o 
 
 RASPPI ?= 2
 AARCH64 ?= 0
