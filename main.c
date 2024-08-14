@@ -12,17 +12,11 @@ const unsigned LINES_PER_LEVEL = 4;
 const unsigned CYCLES_PER_MICRO_SECOND = 250;
 
 unsigned grid[FRAME_HEIGHT][FRAME_WIDTH] = {0};
-unsigned delay = 75000; // micro seconds
-unsigned gameLevel = 1;
+unsigned delay = 150000; // micro seconds
+unsigned game_level = 1;
 unsigned cur_closed_lines = 0;
 
 Queue queue;
-
-void usleep(unsigned delay)
-{
-   for (int i = 0; i < CYCLES_PER_MICRO_SECOND * delay; i++)
-      asm volatile("nop" ::);
-}
 
 boolean validTetrisChar(char c)
 {
@@ -32,8 +26,6 @@ boolean validTetrisChar(char c)
 static void KeyPressedHandler(const char *pString)
 {
    char c = *pString++;
-
-   // Caracteres validos
    if (validTetrisChar(c))
       enqueue(&queue, c);
 }
@@ -131,11 +123,10 @@ void save_to_grid(Tile tile)
    for (int i = 0; i < cnt_full; i++)
       delete_line(full_lines[i]);
 
-   usleep(delay);
-
    // desce as linhas não completas uma a uma
    for (int cnt = 0; cnt < cnt_full; cnt++)
    {
+      TimerusDelay(TimerGet(), delay);
       for (int i = full_lines[cnt] - 1; i >= cnt; i--)
       {
          for (int j = 0; j < FRAME_WIDTH; j++)
@@ -146,7 +137,6 @@ void save_to_grid(Tile tile)
                draw_grid_block(j, i + 1, grid[i + 1][j]);
          }
       }
-      usleep(delay);
    }
 }
 
@@ -203,13 +193,17 @@ boolean run()
    // uma iteração por movimento vertical da nova tile
    while (1)
    {
-      usleep(delay);
+      unsigned start_ticks = TimerGetTicks(TimerGet());
 
       // Le teclas e move tile
-      while (!isQueueEmpty(&queue))
-         move_tile(&tile, dequeue(&queue));
-
-      usleep(delay);
+      while (TimerGetTicks(TimerGet()) - start_ticks <= 20 - game_level)
+         if (!isQueueEmpty(&queue))
+         {
+            char c = dequeue(&queue);
+            if (c == 's')
+               break;
+            move_tile(&tile, c);
+         }
 
       // quando a tile colide no final do frame ou com outra tile
       if (check_collision(tile))
@@ -221,8 +215,8 @@ boolean run()
          {
             delay = (19 * delay) / 20;
             cur_closed_lines = 0;
-            gameLevel++;
-            LogWrite(FromGame, LOG_DEBUG, "Level %d", gameLevel);
+            game_level++;
+            LogWrite(FromGame, LOG_DEBUG, "Level %d", game_level);
          }
 
          return TRUE; // proxima tile
@@ -241,7 +235,7 @@ void start_game()
    // srand(time(0)); // configura seed do rand
 
    setup(); // antes de adicionar as tiles
-   usleep(2 * delay);
+   TimerusDelay(TimerGet(), 2 * delay);
 
    // cada iteração spawna uma nova tile
    // sai do loop quando o jogador perde
