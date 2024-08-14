@@ -489,7 +489,7 @@ void move_block(Block *block, char dir)
       block->y++;
       break;
    default:
-      LogWrite(FromSample, LOG_ERROR, "Key not found in move_block()!");
+      LogWrite(FromGame, LOG_ERROR, "Key not found in move_block()!");
       break;
    }
 }
