@@ -9,8 +9,14 @@ OBJS = main.o
 RASPPI ?= 2
 AARCH64 ?= 0
 
+ifeq ($(strip $(LOGGING)),1)
+LIBUSPENV = $(USPIHOME)/lib/rpi$(RASPPI)/libuspienv.a
+else
+LIBUSPENV = $(USPIHOME)/lib/rpi$(RASPPI)/libuspienv-nolog.a
+endif
+
 LIBS = $(USPIHOME)/lib/rpi$(RASPPI)/libuspi.a \
-	  $(USPIHOME)/lib/rpi$(RASPPI)/libuspienv.a
+	   $(LIBUSPENV)
 
 CFLAGS	+= -I $(USPIHOME)/env/include -I $(USPIHOME)/include
 

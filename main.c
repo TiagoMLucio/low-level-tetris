@@ -7,7 +7,7 @@
 #include <uspios.h>
 #include <uspienv/util.h>
 
-static const char FromSample[] = "sample";
+static const char FromGame[] = "tetris";
 
 #define WIDTH 1280
 #define HEIGHT 800
@@ -277,7 +277,7 @@ void draw_square(int pos_x, int pos_y, unsigned color)
 void draw_grid_square(int j, int i, unsigned color)
 {
    if ((i < 0 || i > 19) || (j < 0 || j > 9))
-      LogWrite(FromSample, LOG_ERROR, "não pode desenhar fora do grid: (i, j) = (%d, %d)", i, j);
+      LogWrite(FromGame, LOG_ERROR, "não pode desenhar fora do grid: (i, j) = (%d, %d)", i, j);
    draw_square(grid_pos_x + j * BLOCK_SIZE, grid_pos_y + i * BLOCK_SIZE, color);
 }
 
@@ -373,7 +373,7 @@ void setup()
 {
    // u32 width = BcmFrameBufferGetWidth(USPiEnvGetScreen()->m_pFrameBuffer);
    // u32 height = BcmFrameBufferGetHeight(USPiEnvGetScreen()->m_pFrameBuffer);
-   // LogWrite(FromSample, LOG_NOTICE, "width = %d, height = %d", width, height);
+   // LogWrite(FromGame, LOG_NOTICE, "width = %d, height = %d", width, height);
    draw_frame();
    // draw_grid(); // debugging
 }
@@ -427,7 +427,7 @@ void save_to_grid(Block block)
 
    // aparentemente toda a lógica abaixo n ta correta ou o SDL que está bugando
 
-   // LogWrite(FromSample, LOG_ERROR, "Linhas completas: %d, A partid da linha: %d", cnt_full, first_full);
+   // LogWrite(FromGame, LOG_ERROR, "Linhas completas: %d, A partid da linha: %d", cnt_full, first_full);
 
    // apaga linhas completas
    for (int i = 0; i < cnt_full; i++)
@@ -456,7 +456,7 @@ void save_to_grid(Block block)
 // quando o jogador perde
 void end_game()
 {
-   LogWrite(FromSample, LOG_ERROR, "Game ended!");
+   LogWrite(FromGame, LOG_ERROR, "Game ended!");
 }
 
 // realiza operação de teclado no tile atual
@@ -499,7 +499,6 @@ u8 read_keys = 1;
 
 static void KeyPressedHandler(const char *pString)
 {
-   ScreenDeviceWrite(USPiEnvGetScreen(), pString, strlen(pString));
    char ch = *pString++;
 
    // Caracteres validos
@@ -571,7 +570,7 @@ int main(void)
 
    if (!USPiInitialize())
    {
-      LogWrite(FromSample, LOG_ERROR, "Cannot initialize USPi");
+      LogWrite(FromGame, LOG_ERROR, "Cannot initialize USPi");
 
       USPiEnvClose();
 
@@ -580,7 +579,7 @@ int main(void)
 
    if (!USPiKeyboardAvailable())
    {
-      LogWrite(FromSample, LOG_ERROR, "Keyboard not found");
+      LogWrite(FromGame, LOG_ERROR, "Keyboard not found");
 
       USPiEnvClose();
 
@@ -591,7 +590,7 @@ int main(void)
 
    USPiKeyboardRegisterKeyPressedHandler(KeyPressedHandler);
 
-   LogWrite(FromSample, LOG_NOTICE, "Just type something!");
+   LogWrite(FromGame, LOG_NOTICE, "Just type something!");
 
    start_game();
 

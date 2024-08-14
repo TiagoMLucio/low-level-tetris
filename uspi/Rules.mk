@@ -31,12 +31,17 @@ endif
 RASPPI	?= 2
 AARCH64 ?= 0
 PREFIX	?= arm-none-eabi-
+DEBUG   ?= 0
+LOGGING ?= 0
 
 CC	= $(PREFIX)gcc
 AS	= $(CC)
 LD	= $(PREFIX)ld
 AR	= $(PREFIX)ar
 
+ifneq ($(strip $(LOGGING)),1)
+LOGGING = 0
+endif
 
 ifeq ($(strip $(RASPPI)),2)
 ARCH	?= -march=armv7-a -mtune=cortex-a7
@@ -50,7 +55,12 @@ OPTIMIZE ?= -O2
 
 AFLAGS	+= $(ARCH) -DRASPPI=$(RASPPI)
 CFLAGS	+= $(ARCH) -Wall -Wno-psabi -fsigned-char -fno-builtin -nostdinc -nostdlib \
-	   -std=gnu99 -undef -DRASPPI=$(RASPPI) -I $(USPIHOME)/include $(OPTIMIZE) #-DNDEBUG
+	   -std=gnu99 -undef -DRASPPI=$(RASPPI) -I $(USPIHOME)/include $(OPTIMIZE) \
+	   -DLOGGING=$(LOGGING)
+
+ifeq ($(strip $(DEBUG)),0)
+CFLAGS	+= -DNDEBUG
+endif
 
 %.o: %.S
 	@echo "  AS    $@"
