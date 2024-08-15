@@ -7,13 +7,11 @@
 extern int errno;
 
 int _write(int file, char *ptr, int len) {
-    // Implement your write function here
-    // For example, you can write to a UART or other output device
     return len;
 }
 
 int _sbrk(int incr) {
-    extern char _end; // Defined by the linker
+    extern char _end;
     static char *heap_end;
     char *prev_heap_end;
 
@@ -27,17 +25,14 @@ int _sbrk(int incr) {
 }
 
 int _close(int file) {
-    // Implement your close function here
     return -1;
 }
 
 int _read(int file, char *ptr, int len) {
-    // Implement your read function here
     return 0;
 }
 
 int _lseek(int file, int ptr, int dir) {
-    // Implement your lseek function here
     return 0;
 }
 
