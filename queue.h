@@ -1,9 +1,10 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#define QUEUE_SIZE 10
+#define QUEUE_SIZE 20
 
-typedef struct {
+typedef struct
+{
     char data[QUEUE_SIZE];
     int front;
     int rear;

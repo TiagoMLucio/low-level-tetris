@@ -20,6 +20,15 @@
 #define SMALL_FRAME_THICKNESS_PX 4
 #define TEXT_GAP 4
 
+#define RESTART_BOX_WIDTH 14
+#define RESTART_BOX_HEIGHT 7
+#define RESTART_BOX_POS_X 0
+#define RESTART_BOX_POS_Y 4 * BLOCK_SIZE
+#define RESTART_BOX_MSG1 "Press 'r'"
+#define RESTART_BOX_MSG1_SIZE 9
+#define RESTART_BOX_MSG2 "to restart..."
+#define RESTART_BOX_MSG2_SIZE 13
+
 #define GAME_FRAME_I 4
 #define GAME_FRAME_J 11
 #define GAME_FRAME_WIDTH 12
@@ -94,6 +103,10 @@ void draw_inner_frame(blocks i, blocks j, blocks width, blocks height, boolean t
 
 void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str, unsigned size, unsigned scale);
 
+void setup_game_screen(void);
+
+void reset_game_screen(void);
+
 void setup_type_frame(void);
 
 void setup_lines_frame(void);
@@ -111,5 +124,13 @@ void setup_game_frame(void);
 void screen_update_lines(unsigned lines);
 
 void screen_update_score(unsigned score);
+
+void screen_update_top(unsigned top);
+
+void screen_update_level(unsigned level);
+
+void display_reset_msg(void);
+
+void clear_reset_msg(void);
 
 #endif // GAME_SCREEN_H

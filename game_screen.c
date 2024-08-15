@@ -80,7 +80,7 @@ void int_to_string(unsigned num, char *str, int size)
 
     int i = size - 1;
     for (int i = size - 1; num > 0 && i >= 0; num /= 10, i--)
-    str[i] = (num % 10) + '0';
+        str[i] = (num % 10) + '0';
 }
 
 void screen_update_lines(unsigned lines)
@@ -97,12 +97,24 @@ void setup_score_frame(void)
 {
     draw_outer_frame(SCORE_FRAME_I, SCORE_FRAME_J, SCORE_FRAME_WIDTH, SCORE_FRAME_HEIGHT);
     draw_inner_frame(SCORE_FRAME_I, SCORE_FRAME_J, SCORE_FRAME_WIDTH, SCORE_FRAME_HEIGHT, FALSE);
-    write_title(SCORE_FRAME_I + 2, SCORE_FRAME_J + 1, 0, 0, SCORE_TITLE_TOP, SCORE_TITLE_TOP_SIZE, FONT_SCALE);
+    write_title(SCORE_FRAME_I + 2, SCORE_FRAME_J + 1, 0, -BLOCK_SIZE / 2, SCORE_TITLE_TOP, SCORE_TITLE_TOP_SIZE, FONT_SCALE);
     write_title(SCORE_FRAME_I + 6, SCORE_FRAME_J + 1, 0, -BLOCK_SIZE / 2, SCORE_TITLE_SCORE, SCORE_TITLE_SCORE_SIZE, FONT_SCALE);
+    screen_update_top(0);
     screen_update_score(0);
 }
 
-void screen_update_score(unsigned score) {
+void screen_update_top(unsigned score)
+{
+    write_title(SCORE_FRAME_I + 3, SCORE_FRAME_J + 1, 0, 0, "      ", 6, FONT_SCALE);
+
+    char score_str[6];
+    int_to_string(score, &score_str, 6);
+
+    write_title(SCORE_FRAME_I + 3, SCORE_FRAME_J + 1, 0, 0, score_str, 6, FONT_SCALE);
+}
+
+void screen_update_score(unsigned score)
+{
     write_title(SCORE_FRAME_I + 7, SCORE_FRAME_J + 1, 0, 0, "      ", 6, FONT_SCALE);
 
     char score_str[6];
@@ -110,7 +122,6 @@ void screen_update_score(unsigned score) {
 
     write_title(SCORE_FRAME_I + 7, SCORE_FRAME_J + 1, 0, 0, score_str, 6, FONT_SCALE);
 }
-
 
 void setup_next_frame(void)
 {
@@ -123,7 +134,18 @@ void setup_level_frame(void)
 {
     draw_outer_frame(LEVEL_FRAME_I, LEVEL_FRAME_J, LEVEL_FRAME_WIDTH, LEVEL_FRAME_HEIGHT);
     draw_inner_frame(LEVEL_FRAME_I, LEVEL_FRAME_J, LEVEL_FRAME_WIDTH, LEVEL_FRAME_HEIGHT, FALSE);
-    write_title(LEVEL_FRAME_I + 1, LEVEL_FRAME_J + 1, BLOCK_SIZE / 2, 0, LEVEL_TITLE, LEVEL_TITLE_SIZE, FONT_SCALE);
+    write_title(LEVEL_FRAME_I + 1, LEVEL_FRAME_J + 1, BLOCK_SIZE / 2, -4, LEVEL_TITLE, LEVEL_TITLE_SIZE, FONT_SCALE);
+    screen_update_level(1);
+}
+
+void screen_update_level(unsigned level)
+{
+    write_title(LEVEL_FRAME_I + 2, LEVEL_FRAME_J + 3, 0, 6, "  ", 2, FONT_SCALE);
+
+    char level_str[2];
+    int_to_string(level, &level_str, 2);
+
+    write_title(LEVEL_FRAME_I + 2, LEVEL_FRAME_J + 3, 0, 6, level_str, 2, FONT_SCALE);
 }
 
 void setup_statistics_frame(void)
@@ -137,4 +159,39 @@ void setup_game_frame(void)
 {
     draw_outer_frame(GAME_FRAME_I, GAME_FRAME_J, GAME_FRAME_WIDTH, GAME_FRAME_HEIGHT);
     draw_inner_frame(GAME_FRAME_I, GAME_FRAME_J, GAME_FRAME_WIDTH, GAME_FRAME_HEIGHT, TRUE);
+}
+
+void setup_game_screen(void)
+{
+    setup_game_frame();
+    setup_type_frame();
+    setup_lines_frame();
+    setup_score_frame();
+    setup_next_frame();
+    setup_level_frame();
+    setup_statistics_frame();
+    // draw_grid(); // debugging
+}
+
+void reset_game_screen(void)
+{
+    screen_update_level(1);
+    screen_update_lines(0);
+    screen_update_score(0);
+}
+
+void display_reset_msg(void)
+{
+    clear_reset_msg();
+    draw_rect(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH * BLOCK_SIZE, RESTART_BOX_HEIGHT * BLOCK_SIZE, FRAME_THICKNESS_PX, BG_MAIN_PALETTE);
+    draw_rect(RESTART_BOX_POS_X + FRAME_THICKNESS_PX, RESTART_BOX_POS_Y + FRAME_THICKNESS_PX, RESTART_BOX_WIDTH * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, RESTART_BOX_HEIGHT * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, FRAME_THICKNESS_PX, BG_SECONDARY_PALETTE);
+
+    unsigned pos_y = RESTART_BOX_POS_Y + 2 * BLOCK_SIZE - CHAR_HEIGHT / 2 + BLOCK_SIZE / 2;
+
+    write_string(RESTART_BOX_POS_X + BLOCK_SIZE + TEXT_GAP, pos_y, RESTART_BOX_MSG1, RESTART_BOX_MSG1_SIZE, FONT_SCALE);
+    write_string(RESTART_BOX_POS_X + BLOCK_SIZE + TEXT_GAP, pos_y + 2 * BLOCK_SIZE, RESTART_BOX_MSG2, RESTART_BOX_MSG2_SIZE, FONT_SCALE);
+}
+
+void clear_reset_msg(void) {
+    draw_square(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH, 0);
 }

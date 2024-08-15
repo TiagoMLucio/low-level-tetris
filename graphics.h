@@ -7,6 +7,7 @@
 #define SCREEN_HEIGHT 800
 
 #define CHAR_BASE_HEIGHT 16
+#define SPACE_BASE_HEIGHT 14
 #define CHAR_HEIGHT (FONT_SCALE * CHAR_BASE_HEIGHT)
 
 // Draw a single pixel on the screen

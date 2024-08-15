@@ -16,13 +16,16 @@
 
 static const char FromGame[] = "tetris";
 
-const unsigned LINES_PER_LEVEL = 4;
-const unsigned CYCLES_PER_MICRO_SECOND = 250;
-
+const unsigned LINES_PER_LEVEL = 5;
 const unsigned SCORE_PER_CLEAR[4] = {100, 300, 500, 800};
+const unsigned SPEDUP_ROUNDS = 2;
+const unsigned SPEDUP_REDUCTION = 3;
 
 unsigned grid[GAME_GRID_HEIGHT][GAME_GRID_WIDTH] = {0};
-unsigned delay = 150000; // micro seconds
+unsigned delay = 250000; // micro seconds
+unsigned cur_delay = 250000;
+
+unsigned spedup_rounds_left = 0;
 unsigned game_level = 1;
 unsigned closed_lines = 0;
 unsigned top = 0;
@@ -32,7 +35,7 @@ Queue queue;
 
 boolean validTetrisChar(char c)
 {
-   return c == 'w' || c == 'a' || c == 's' || c == 'd';
+   return c == 'w' || c == 'a' || c == 's' || c == 'd' || c == 'r';
 }
 
 static void KeyPressedHandler(const char *pString)
@@ -92,18 +95,6 @@ void update_score(unsigned cleared)
    screen_update_score(score);
 }
 
-void setup()
-{
-   setup_game_frame();
-   setup_type_frame();
-   setup_lines_frame();
-   setup_score_frame();
-   setup_next_frame();
-   setup_level_frame();
-   setup_statistics_frame();
-   // draw_grid(); // debugging
-}
-
 // salva no grid quando tile colide
 void save_to_grid(Tile tile)
 {
@@ -154,7 +145,7 @@ void save_to_grid(Tile tile)
    // desce as linhas não completas uma a uma
    for (int cnt = 0; cnt < cnt_full; cnt++)
    {
-      TimerusDelay(TimerGet(), delay);
+      TimerusDelay(TimerGet(), cur_delay);
       for (int i = full_lines[cnt] - 1; i >= cnt; i--)
       {
          for (int j = 0; j < GAME_GRID_WIDTH; j++)
@@ -166,12 +157,6 @@ void save_to_grid(Tile tile)
          }
       }
    }
-}
-
-// quando o jogador perde
-void end_game()
-{
-   LogWrite(FromGame, LOG_DEBUG, "Game ended!");
 }
 
 // realiza operação de teclado no tile atual
@@ -201,8 +186,11 @@ void move_tile(Tile *tile, char dir)
       put_tile(*tile);
       break;
    case 's':
-      tile->y++;
+      cur_delay /= SPEDUP_REDUCTION;
+      spedup_rounds_left = SPEDUP_ROUNDS;
       break;
+   case 'r':
+      break; // ignore
    default:
       LogWrite(FromGame, LOG_ERROR, "Key not found in move_tile()!");
       break;
@@ -221,15 +209,18 @@ boolean run()
    // uma iteração por movimento vertical da nova tile
    while (1)
    {
-      unsigned start_ticks = TimerGetTicks(TimerGet());
+      unsigned start_ticks = TimerGetClockTicks(TimerGet());
+
+      if (spedup_rounds_left == 0)
+         cur_delay = delay;
+      else
+         spedup_rounds_left--;
 
       // Le teclas e move tile
-      while (TimerGetTicks(TimerGet()) - start_ticks <= 20 - game_level)
+      while (TimerGetClockTicks(TimerGet()) - start_ticks <= cur_delay)
          if (!isQueueEmpty(&queue))
          {
             char c = dequeue(&queue);
-            if (c == 's')
-               break;
             move_tile(&tile, c);
          }
 
@@ -241,9 +232,9 @@ boolean run()
 
          if (closed_lines >= game_level * LINES_PER_LEVEL)
          {
-            delay = (19 * delay) / 20;
-            closed_lines = 0;
+            delay = 9 * delay / 10;
             game_level++;
+            screen_update_level(game_level);
             LogWrite(FromGame, LOG_DEBUG, "Level %d", game_level);
          }
 
@@ -258,6 +249,20 @@ boolean run()
    }
 }
 
+void reset_game() {
+   if(score > top) {
+      top = score;
+      screen_update_top(top);
+   }
+
+   spedup_rounds_left = 0;
+   game_level = 1;
+   closed_lines = 0;
+   score = 0;
+   
+   reset_game_screen();
+}
+
 void start_game()
 {
    unsigned seed = get_current_time();
@@ -267,15 +272,33 @@ void start_game()
 
    srand(seed);
 
-   setup(); // antes de adicionar as tiles
-   TimerusDelay(TimerGet(), 2 * delay);
+   setup_game_screen(); // antes de adicionar as tiles
+   TimerusDelay(TimerGet(), 2 * cur_delay);
 
-   // cada iteração spawna uma nova tile
-   // sai do loop quando o jogador perde
-   while (run())
-      ;
+   // uma iteração por jogo
+   while (1)
+   {
 
-   end_game();
+      // cada iteração spawna uma nova tile
+      // sai do loop quando o jogador perde
+      while (run())
+         ;
+
+      LogWrite(FromGame, LOG_DEBUG, "Game ended!");
+
+      display_reset_msg();
+
+      // espera pelo reset
+      while (1)
+      {
+         if (!isQueueEmpty(&queue)) {
+            char c = dequeue(&queue);
+            if (c == 'r') break;
+         }
+      }
+
+      reset_game();
+   }
 }
 
 int main(void)
