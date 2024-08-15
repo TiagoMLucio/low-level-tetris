@@ -5,8 +5,6 @@
 #include "queue.h"
 #include "frame.h"
 #include "tile.h"
-#include <uspienv/timer.h>
-#include <uspienv/string.h>
 #include "uptime.h"
 
 #include "custom_types.h"

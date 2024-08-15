@@ -2,6 +2,8 @@
 *.o
 *.a
 !uspi/lib/**/*.a
+!libgcc/lib/*.a
+!newlib/lib/*.a
 *.elf
 *.lst
 *.img

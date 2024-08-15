@@ -39,10 +39,6 @@ AS	= $(CC)
 LD	= $(PREFIX)ld
 AR	= $(PREFIX)ar
 
-ifneq ($(strip $(LOGGING)),1)
-LOGGING = 0
-endif
-
 ifeq ($(strip $(RASPPI)),2)
 ARCH	?= -march=armv7-a -mtune=cortex-a7
 TARGET	?= kernel7
@@ -56,13 +52,8 @@ OPTIMIZE ?= -O2
 AFLAGS	+= $(ARCH) -DRASPPI=$(RASPPI)
 CFLAGS	+= $(ARCH) -Wall -Wno-psabi -fsigned-char -fno-builtin -nostdinc -nostdlib \
 	   -std=gnu99 -undef -DRASPPI=$(RASPPI) -I $(USPIHOME)/include $(OPTIMIZE) \
-	   -DLOGGING=$(LOGGING) -D__IEEE_LITTLE_ENDIAN \
-	   -D__INTPTR_TYPE__=long\ int -D__UINTPTR_TYPE__=long\ unsigned\ int \
-	   -D__INT32_TYPE__=int 
-
-ifeq ($(strip $(DEBUG)),0)
-CFLAGS	+= -DNDEBUG
-endif
+	   -D__IEEE_LITTLE_ENDIAN -D__INT32_TYPE__=int \
+	   -D__INTPTR_TYPE__=long\ int -D__UINTPTR_TYPE__=long\ unsigned\ int
 
 %.o: %.S
 	@echo "  AS    $@"
