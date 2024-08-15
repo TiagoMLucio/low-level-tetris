@@ -5,6 +5,16 @@
 #include "queue.h"
 #include "frame.h"
 #include "tile.h"
+#include <uspienv/timer.h>
+#include <uspienv/string.h>
+#include "uptime.h"
+
+#include "custom_types.h"
+#include <stdint.h>
+
+#define malloc uspi_malloc
+#include <stdlib.h>
+#undef malloc
 
 static const char FromGame[] = "tetris";
 
@@ -232,7 +242,11 @@ boolean run()
 
 void start_game()
 {
-   // srand(time(0)); // configura seed do rand
+   unsigned seed = get_current_time();
+   
+   LogWrite(FromGame, LOG_NOTICE, "Seed: %u", seed);
+   
+   srand(seed);
 
    setup(); // antes de adicionar as tiles
    TimerusDelay(TimerGet(), 2 * delay);
