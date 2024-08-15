@@ -19,10 +19,14 @@ static const char FromGame[] = "tetris";
 const unsigned LINES_PER_LEVEL = 4;
 const unsigned CYCLES_PER_MICRO_SECOND = 250;
 
+const unsigned SCORE_PER_CLEAR[4] = {100, 300, 500, 800};
+
 unsigned grid[GAME_GRID_HEIGHT][GAME_GRID_WIDTH] = {0};
 unsigned delay = 150000; // micro seconds
 unsigned game_level = 1;
-unsigned cur_closed_lines = 0;
+unsigned closed_lines = 0;
+unsigned top = 0;
+unsigned score = 0;
 
 Queue queue;
 
@@ -82,6 +86,12 @@ boolean check_rotation_collision(Tile tile)
    return FALSE;
 }
 
+void update_score(unsigned cleared)
+{
+   score += SCORE_PER_CLEAR[cleared - 1] * game_level;
+   screen_update_score(score);
+}
+
 void setup()
 {
    setup_game_frame();
@@ -130,8 +140,12 @@ void save_to_grid(Tile tile)
    }
 
    if (cnt_full > 0)
+   {
       LogWrite(FromGame, LOG_DEBUG, "Linhas completas: %d", cnt_full);
-   cur_closed_lines += cnt_full;
+      closed_lines += cnt_full;
+      update_score(cnt_full);
+      screen_update_lines(closed_lines);
+   }
 
    // apaga linhas completas
    for (int i = 0; i < cnt_full; i++)
@@ -225,10 +239,10 @@ boolean run()
          // salva no grid e verifica/opera linhas completas
          save_to_grid(tile);
 
-         if (cur_closed_lines >= LINES_PER_LEVEL)
+         if (closed_lines >= game_level * LINES_PER_LEVEL)
          {
             delay = (19 * delay) / 20;
-            cur_closed_lines = 0;
+            closed_lines = 0;
             game_level++;
             LogWrite(FromGame, LOG_DEBUG, "Level %d", game_level);
          }

@@ -6,6 +6,9 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 800
 
+#define CHAR_BASE_HEIGHT 16
+#define CHAR_HEIGHT (FONT_SCALE * CHAR_BASE_HEIGHT)
+
 // Draw a single pixel on the screen
 void fb_pixel(int x, int y, unsigned color);
 

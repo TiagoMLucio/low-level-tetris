@@ -69,6 +69,28 @@ void setup_lines_frame(void)
     draw_outer_frame(LINES_FRAME_I, LINES_FRAME_J, LINES_FRAME_WIDTH, LINES_FRAME_HEIGHT);
     draw_inner_frame(LINES_FRAME_I, LINES_FRAME_J, LINES_FRAME_WIDTH, LINES_FRAME_HEIGHT, FALSE);
     write_title(LINES_FRAME_I + 1, LINES_FRAME_J + 2, 0, 0, LINES_TITLE, LINES_TITLE_SIZE, FONT_SCALE);
+    screen_update_lines(0);
+}
+
+void int_to_string(unsigned num, char *str, int size)
+{
+    for (int i = 0; i < size; i++)
+        str[i] = '0';
+    str[size] = '\0';
+
+    int i = size - 1;
+    for (int i = size - 1; num > 0 && i >= 0; num /= 10, i--)
+    str[i] = (num % 10) + '0';
+}
+
+void screen_update_lines(unsigned lines)
+{
+    write_title(LINES_FRAME_I + 1, LINES_FRAME_J + 7, TEXT_GAP, 0, "   ", 3, FONT_SCALE);
+
+    char lines_str[3];
+    int_to_string(lines, &lines_str, 3);
+
+    write_title(LINES_FRAME_I + 1, LINES_FRAME_J + 7, TEXT_GAP, 0, lines_str, 3, FONT_SCALE);
 }
 
 void setup_score_frame(void)
@@ -76,14 +98,25 @@ void setup_score_frame(void)
     draw_outer_frame(SCORE_FRAME_I, SCORE_FRAME_J, SCORE_FRAME_WIDTH, SCORE_FRAME_HEIGHT);
     draw_inner_frame(SCORE_FRAME_I, SCORE_FRAME_J, SCORE_FRAME_WIDTH, SCORE_FRAME_HEIGHT, FALSE);
     write_title(SCORE_FRAME_I + 2, SCORE_FRAME_J + 1, 0, 0, SCORE_TITLE_TOP, SCORE_TITLE_TOP_SIZE, FONT_SCALE);
-    write_title(SCORE_FRAME_I + 6, SCORE_FRAME_J + 1, 0, 0, SCORE_TITLE_SCORE, SCORE_TITLE_SCORE_SIZE, FONT_SCALE);
+    write_title(SCORE_FRAME_I + 6, SCORE_FRAME_J + 1, 0, -BLOCK_SIZE / 2, SCORE_TITLE_SCORE, SCORE_TITLE_SCORE_SIZE, FONT_SCALE);
+    screen_update_score(0);
 }
+
+void screen_update_score(unsigned score) {
+    write_title(SCORE_FRAME_I + 7, SCORE_FRAME_J + 1, 0, 0, "      ", 6, FONT_SCALE);
+
+    char score_str[6];
+    int_to_string(score, &score_str, 6);
+
+    write_title(SCORE_FRAME_I + 7, SCORE_FRAME_J + 1, 0, 0, score_str, 6, FONT_SCALE);
+}
+
 
 void setup_next_frame(void)
 {
     draw_outer_frame(NEXT_FRAME_I, NEXT_FRAME_J, NEXT_FRAME_WIDTH, NEXT_FRAME_HEIGHT);
     draw_inner_frame(NEXT_FRAME_I, NEXT_FRAME_J, NEXT_FRAME_WIDTH, NEXT_FRAME_HEIGHT, TRUE);
-    write_title(NEXT_FRAME_I + 2, NEXT_FRAME_J + 1, BLOCK_SIZE / 2, -BLOCK_SIZE / 2, NEXT_TITLE, NEXT_TITLE_SIZE, FONT_SCALE);
+    write_title(NEXT_FRAME_I + 2, NEXT_FRAME_J + 1, 6, -BLOCK_SIZE / 2, NEXT_TITLE, NEXT_TITLE_SIZE, FONT_SCALE);
 }
 
 void setup_level_frame(void)

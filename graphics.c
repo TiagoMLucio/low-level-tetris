@@ -42,12 +42,12 @@ void write_string(unsigned x, unsigned y, const void *str, unsigned size, unsign
 void display_char(unsigned *pos_x, unsigned pos_y, char c, unsigned scale, unsigned color)
 {
     TScreenDevice *pThis = USPiEnvGetScreen();
-    for (unsigned y = 0; y < CharGeneratorGetCharHeight(&pThis->m_CharGen); y++)
+    for (unsigned y = 0; y < CHAR_BASE_HEIGHT; y++)
         for (unsigned x = 0; x < CharGeneratorGetCharWidth(&pThis->m_CharGen); x++)
-            for(int i = 0; i < scale; i++)
-                for(int j = 0; j < scale; j++)
-                if (CharGeneratorGetPixel(&pThis->m_CharGen, c, x, y))
-                    ScreenDeviceSetPixel(pThis, *pos_x + scale * x + j, pos_y + scale * y + i, color);
+            for (int i = 0; i < scale; i++)
+                for (int j = 0; j < scale; j++)
+                    if (c == ' ' || CharGeneratorGetPixel(&pThis->m_CharGen, c, x, y))
+                        ScreenDeviceSetPixel(pThis, *pos_x + scale * x + j, pos_y + scale * y + i, c != ' ' ? color : 0);
 
     *pos_x += scale * CharGeneratorGetCharWidth(&pThis->m_CharGen);
 }

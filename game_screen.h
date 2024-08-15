@@ -5,13 +5,12 @@
 #include "graphics.h"
 
 #define FONT_SCALE 3
-#define CHAR_BASE_HEIGHT 16
-#define CHAR_HEIGHT (FONT_SCALE * CHAR_BASE_HEIGHT)
 
 #define BLOCK_SIZE 28
 #define GAME_WIDTH 32
 #define GAME_HEIGHT 28
-#define GAME_POS_X (SCREEN_WIDTH / 2 - GAME_WIDTH * BLOCK_SIZE / 2)
+#define GAME_DISPLACEMENT_X 8 * BLOCK_SIZE
+#define GAME_POS_X (SCREEN_WIDTH / 2 - GAME_WIDTH * BLOCK_SIZE / 2 + GAME_DISPLACEMENT_X)
 #define GAME_POS_Y (SCREEN_HEIGHT / 2 - GAME_HEIGHT * BLOCK_SIZE / 2)
 
 #define block_position_x(j) (GAME_POS_X + j * BLOCK_SIZE)
@@ -49,7 +48,7 @@
 #define LINES_FRAME_J 11
 #define LINES_FRAME_WIDTH 12
 #define LINES_FRAME_HEIGHT 3
-#define LINES_TITLE "LINES-000"
+#define LINES_TITLE "LINES-"
 #define LINES_TITLE_SIZE 9
 
 #define SCORE_FRAME_I 1
@@ -108,5 +107,9 @@ void setup_level_frame(void);
 void setup_statistics_frame(void);
 
 void setup_game_frame(void);
+
+void screen_update_lines(unsigned lines);
+
+void screen_update_score(unsigned score);
 
 #endif // GAME_SCREEN_H
