@@ -44,7 +44,6 @@ void _Logger (TLogger *pThis)
 	pThis->m_pTimer = 0;
 }
 
-#if LOGGING == 1
 boolean LoggerInitialize (TLogger *pThis, TScreenDevice *pTarget)
 {
 	pThis->m_pTarget = pTarget;
@@ -53,14 +52,6 @@ boolean LoggerInitialize (TLogger *pThis, TScreenDevice *pTarget)
 
 	return TRUE;
 }
-#else
-boolean LoggerInitialize (TLogger *pThis, TScreenDevice *pTarget)
-{
-	pThis->m_pTarget = pTarget;
-	
-	return TRUE;
-}
-#endif
 
 void LoggerWrite (TLogger *pThis, const char *pSource, TLogSeverity Severity, const char *pMessage, ...)
 {

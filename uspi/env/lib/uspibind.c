@@ -91,7 +91,6 @@ int GetMACAddress (unsigned char Buffer[6])
 	return 1;
 }
 
-#if LOGGING == 1
 void LogWrite (const char *pSource, unsigned Severity, const char *pMessage, ...)
 {
 	va_list var;
@@ -101,11 +100,6 @@ void LogWrite (const char *pSource, unsigned Severity, const char *pMessage, ...
 
 	va_end (var);
 }
-#else
-void LogWrite (const char *pSource, unsigned Severity, const char *pMessage, ...)
-{
-}
-#endif
 
 
 #ifndef NDEBUG
