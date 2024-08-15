@@ -2,7 +2,7 @@
 #define TILE_H
 
 #include <uspienv.h>
-#include "frame.h"
+#include "game_screen.h"
 #include "queue.h"
 
 #define ROTATIONS 4

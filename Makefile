@@ -4,7 +4,7 @@
 
 USPIHOME = ./uspi
 
-OBJS = queue.o graphics.o frame.o tile.o main.o  syscalls.o uptime.o
+OBJS = queue.o graphics.o game_screen.o tile.o main.o  syscalls.o uptime.o
 
 RASPPI ?= 2
 AARCH64 ?= 0

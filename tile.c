@@ -140,15 +140,9 @@ void draw_tile(Tile tile, unsigned color)
     int(*rotation)[ROTATION_GRID_SIZE] = type.rotations[tile.rotation];
 
     for (int i = 0; i < ROTATION_GRID_SIZE; i++)
-    {
         for (int j = 0; j < ROTATION_GRID_SIZE; j++)
-        {
             if (rotation[i][j])
-            {
-                draw_grid_block(tile.x + j, tile.y + i, color);
-            }
-        }
-    }
+                draw_grid_block(tile.y + i, tile.x + j, color);
 }
 
 void put_tile(Tile tile)

@@ -3,7 +3,7 @@
 #include <uspios.h>
 #include <uspienv/util.h>
 #include "queue.h"
-#include "frame.h"
+#include "game_screen.h"
 #include "tile.h"
 #include "uptime.h"
 
@@ -19,7 +19,7 @@ static const char FromGame[] = "tetris";
 const unsigned LINES_PER_LEVEL = 4;
 const unsigned CYCLES_PER_MICRO_SECOND = 250;
 
-unsigned grid[FRAME_HEIGHT][FRAME_WIDTH] = {0};
+unsigned grid[GAME_GRID_HEIGHT][GAME_GRID_WIDTH] = {0};
 unsigned delay = 150000; // micro seconds
 unsigned game_level = 1;
 unsigned cur_closed_lines = 0;
@@ -43,14 +43,14 @@ boolean check_collision(Tile tile)
    int(*rotation)[ROTATION_GRID_SIZE] = get_rotation(tile);
    for (int i = 0; i < ROTATION_GRID_SIZE; i++)
       for (int j = 0; j < ROTATION_GRID_SIZE; j++)
-         if (rotation[i][j] && (grid[tile.y + 1 + i][tile.x + j] || tile.y + 1 + i >= FRAME_HEIGHT))
+         if (rotation[i][j] && (grid[tile.y + 1 + i][tile.x + j] || tile.y + 1 + i >= GAME_GRID_HEIGHT))
             return TRUE;
    return FALSE;
 }
 
 boolean check_lateral_collision(int tileX, int tileY, int i, int j, char ch)
 {
-   return (ch == 'a') ? (tileX + j - 1 < 0 || grid[tileY + i][tileX + j - 1]) : (tileX + 1 + j >= 10 || grid[tileY + i][tileX + j + 1]);
+   return (ch == 'a') ? (tileX + j - 1 < 0 || grid[tileY + i][tileX + j - 1]) : (tileX + 1 + j >= GAME_GRID_WIDTH || grid[tileY + i][tileX + j + 1]);
 }
 
 boolean check_horizontal_collision(Tile tile, char ch)
@@ -67,7 +67,7 @@ boolean check_horizontal_collision(Tile tile, char ch)
 
 boolean check_rotational_collision(int tileX, int tileY, int i, int j)
 {
-   return (tileX + j < 0 || tileX + j >= FRAME_WIDTH || grid[tileY + i][tileX + j] || tileY + 1 + i >= FRAME_HEIGHT);
+   return (tileX + j < 0 || tileX + j >= GAME_GRID_WIDTH || grid[tileY + i][tileX + j] || tileY + 1 + i >= GAME_GRID_HEIGHT);
 }
 
 boolean check_rotation_collision(Tile tile)
@@ -84,7 +84,13 @@ boolean check_rotation_collision(Tile tile)
 
 void setup()
 {
-   draw_frame();
+   setup_game_frame();
+   setup_type_frame();
+   setup_lines_frame();
+   setup_score_frame();
+   setup_next_frame();
+   setup_level_frame();
+   setup_statistics_frame();
    // draw_grid(); // debugging
 }
 
@@ -99,12 +105,12 @@ void save_to_grid(Tile tile)
    int cnt_full = 0;
 
    // verifica quais linhas completaram
-   for (int i = 0; i < ROTATION_GRID_SIZE && tile.y + i < FRAME_HEIGHT; i++)
+   for (int i = 0; i < ROTATION_GRID_SIZE && tile.y + i < GAME_GRID_HEIGHT; i++)
    {
       boolean added_to_line = 0;
       for (int j = 0; j < ROTATION_GRID_SIZE; j++)
       {
-         if (tile.x + j < FRAME_WIDTH && rotation[i][j])
+         if (tile.x + j < GAME_GRID_WIDTH && rotation[i][j])
          {
             grid[tile.y + i][tile.x + j] = rotation[i][j] ? color : 0;
             added_to_line = 1;
@@ -114,7 +120,7 @@ void save_to_grid(Tile tile)
       {
 
          boolean full_line = TRUE;
-         for (int j = 0; j < FRAME_WIDTH; j++)
+         for (int j = 0; j < GAME_GRID_WIDTH; j++)
             if (!grid[tile.y + i][j])
                full_line = FALSE;
 
@@ -137,12 +143,12 @@ void save_to_grid(Tile tile)
       TimerusDelay(TimerGet(), delay);
       for (int i = full_lines[cnt] - 1; i >= cnt; i--)
       {
-         for (int j = 0; j < FRAME_WIDTH; j++)
+         for (int j = 0; j < GAME_GRID_WIDTH; j++)
          {
             grid[i + 1][j] = grid[i][j];
-            draw_grid_block(j, i, 0);
+            draw_grid_block(i, j, 0);
             if (grid[i + 1][j])
-               draw_grid_block(j, i + 1, grid[i + 1][j]);
+               draw_grid_block(i + 1, j, grid[i + 1][j]);
          }
       }
    }
@@ -193,10 +199,10 @@ boolean run()
 {
    Tile tile = create_tile();
 
+   put_tile(tile); // spawna nova tile
+
    if (check_collision(tile)) // colidiu antes de spawnar
       return FALSE;           // finaliza o jogo
-
-   put_tile(tile); // spawna nova tile
 
    // uma iteração por movimento vertical da nova tile
    while (1)
@@ -241,9 +247,10 @@ boolean run()
 void start_game()
 {
    unsigned seed = get_current_time();
-   
+
    LogWrite(FromGame, LOG_NOTICE, "Seed: %u", seed);
-   
+   LogWrite(FromGame, LOG_DEBUG, "Width: %upx, Height: %upx", ScreenDeviceGetWidth(USPiEnvGetScreen()), ScreenDeviceGetHeight(USPiEnvGetScreen()));
+
    srand(seed);
 
    setup(); // antes de adicionar as tiles

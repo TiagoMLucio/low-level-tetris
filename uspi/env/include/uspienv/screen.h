@@ -56,6 +56,8 @@ extern "C" {
 	#define BLUE_COLOR16    		COLOR16(0, 0, 31)   // Azul
 	#define GREEN_COLOR16   		COLOR16(0, 31, 0)   // Verde
 	#define RED_COLOR16     		COLOR16(31, 0, 0)   // Vermelho
+	#define BG_MAIN_COLOR16			COLOR16(14, 14, 14)
+	#define BG_SECONDARY_COLOR16  	COLOR16(18, 31, 30)
 
 	#define NORMAL_COLOR			1
 	#define HIGH_COLOR				2
@@ -67,6 +69,8 @@ extern "C" {
 	#define BLUE_PALETTE    		8
 	#define GREEN_PALETTE   		9
 	#define RED_PALETTE     		10
+	#define BG_MAIN_PALETTE  		11
+	#define BG_SECONDARY_PALETTE	12
 #elif DEPTH == 16
 	typedef u16 TScreenColor;
 
