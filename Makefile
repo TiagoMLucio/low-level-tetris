@@ -4,21 +4,24 @@
 
 USPIHOME = ./uspi
 
-OBJS = queue.o graphics.o frame.o tile.o main.o 
+OBJS = queue.o graphics.o frame.o tile.o main.o  syscalls.o uptime.o
 
 RASPPI ?= 2
 AARCH64 ?= 0
 
-ifeq ($(strip $(LOGGING)),1)
+NEWLIBHOME = ./newlib
+LIBGCCHOME = ./libgcc
+
+LIBUSPI = $(USPIHOME)/lib/rpi$(RASPPI)/libuspi.a
+LIB_NEWLIB = $(NEWLIBHOME)/lib/libc.a
+LIB_LIBGCC = $(LIBGCCHOME)/lib/libgcc.a
 LIBUSPENV = $(USPIHOME)/lib/rpi$(RASPPI)/libuspienv.a
-else
-LIBUSPENV = $(USPIHOME)/lib/rpi$(RASPPI)/libuspienv-nolog.a
-endif
 
-LIBS = $(USPIHOME)/lib/rpi$(RASPPI)/libuspi.a \
-	   $(LIBUSPENV)
+LIBS = $(LIBUSPI) $(LIBUSPENV) $(LIB_NEWLIB) $(LIB_LIBGCC)
 
-CFLAGS	+= -I $(USPIHOME)/env/include -I $(USPIHOME)/include
+CFLAGS	+= -I $(USPIHOME)/env/include -I $(USPIHOME)/include \
+	   	   -I $(NEWLIBHOME)/include -I $(LIBGCCHOME)/include \
+		   -I $(LIBGCCHOME)/plugin/include
 
 include $(USPIHOME)/Rules.mk
 

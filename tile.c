@@ -2,6 +2,10 @@
 #include <uspienv/util.h>
 #include "graphics.h"
 
+#include "custom_types.h"
+#include <stdint.h>
+#include <stdlib.h>
+
 TileType TILE_TYPES[] = {
     // I block
     {{{{1, 1, 1, 1},
@@ -169,10 +173,9 @@ int (*get_next_rotation(Tile tile))[ROTATION_GRID_SIZE]
 
 Tile create_tile(void)
 {
-    static unsigned type = 0, rot = 0;
     Tile current_tile;
-    current_tile.type = type++ % 7; // Random tile among the three defined ones
-    current_tile.rotation = rot++ % ROTATION_GRID_SIZE;
+    current_tile.type = rand() % 7; // Random tile among the three defined ones
+    current_tile.rotation = rand() % ROTATION_GRID_SIZE;
     current_tile.x = 3; // Starting X position (middle of the frame)
     current_tile.y = 0; // Starting Y position (top of the frame)
 
