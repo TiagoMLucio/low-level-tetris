@@ -249,8 +249,20 @@ boolean run()
    }
 }
 
-void reset_game() {
-   if(score > top) {
+void reset_grid()
+{
+   for (int i = 0; i < GAME_GRID_HEIGHT; i++)
+      for (int j = 0; j < GAME_GRID_WIDTH; j++)
+      {
+         grid[i][j] = 0;
+         draw_grid_block(i, j, 0);
+      }
+}
+
+void restart_game()
+{
+   if (score > top)
+   {
       top = score;
       screen_update_top(top);
    }
@@ -259,8 +271,10 @@ void reset_game() {
    game_level = 1;
    closed_lines = 0;
    score = 0;
-   
+
    reset_game_screen();
+   initQueue(&queue);
+   reset_grid();
 }
 
 void start_game()
@@ -291,13 +305,15 @@ void start_game()
       // espera pelo reset
       while (1)
       {
-         if (!isQueueEmpty(&queue)) {
+         if (!isQueueEmpty(&queue))
+         {
             char c = dequeue(&queue);
-            if (c == 'r') break;
+            if (c == 'r')
+               break;
          }
       }
 
-      reset_game();
+      restart_game();
    }
 }
 

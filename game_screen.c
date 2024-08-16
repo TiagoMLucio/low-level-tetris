@@ -12,7 +12,7 @@ void draw_game_block(unsigned i, unsigned j, unsigned color)
     draw_square(GAME_POS_X + j * BLOCK_SIZE, GAME_POS_Y + i * BLOCK_SIZE, BLOCK_SIZE, color);
 }
 
-void draw_grid_block(unsigned i, unsigned j, unsigned color)
+void draw_grid_block(blocks i, blocks j, unsigned color)
 {
     if (i >= GAME_GRID_HEIGHT || j >= GAME_GRID_WIDTH)
         LogWrite(FromGameScreen, LOG_ERROR, "draw called outside of grid: (i, j) = (%d, %d)", i, j);
@@ -178,6 +178,7 @@ void reset_game_screen(void)
     screen_update_level(1);
     screen_update_lines(0);
     screen_update_score(0);
+    clear_reset_msg();
 }
 
 void display_reset_msg(void)
@@ -192,6 +193,7 @@ void display_reset_msg(void)
     write_string(RESTART_BOX_POS_X + BLOCK_SIZE + TEXT_GAP, pos_y + 2 * BLOCK_SIZE, RESTART_BOX_MSG2, RESTART_BOX_MSG2_SIZE, FONT_SCALE);
 }
 
-void clear_reset_msg(void) {
+void clear_reset_msg(void)
+{
     draw_square(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH, 0);
 }
