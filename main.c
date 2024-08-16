@@ -297,6 +297,7 @@ void restart_game()
 
 void setup_game_screen(void)
 {
+   clear_cursor();
    draw_background();
    draw_background_tiles();
    setup_game_frame();

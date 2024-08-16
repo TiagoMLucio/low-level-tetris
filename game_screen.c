@@ -82,6 +82,10 @@ void draw_background(void)
     draw_block_rect(LEVEL_FRAME_I, LEVEL_FRAME_J, LEVEL_FRAME_WIDTH, LEVEL_FRAME_HEIGHT, BLACK_COLOR);
 }
 
+void clear_cursor(void) {
+    draw_square(0, 0, 2 * BLOCK_SIZE, BLACK_COLOR);
+}
+
 void setup_type_frame(void)
 {
     draw_outer_frame(TYPE_FRAME_I, TYPE_FRAME_J, TYPE_FRAME_WIDTH, TYPE_FRAME_HEIGHT);
@@ -216,7 +220,9 @@ void reset_game_screen(void)
     screen_update_lines(0);
     screen_update_score(0);
     clear_reset_msg();
-    screen_erase_qrcode();
+
+    if (SHOW_QRCODE)
+        screen_erase_qrcode();
 }
 
 void display_reset_msg(void)
@@ -232,7 +238,8 @@ void display_reset_msg(void)
     write_string(RESTART_BOX_POS_X + BLOCK_SIZE + TEXT_GAP, pos_y, RESTART_BOX_MSG1, RESTART_BOX_MSG1_SIZE, FONT_SCALE, NORMAL_COLOR);
     write_string(RESTART_BOX_POS_X + BLOCK_SIZE + TEXT_GAP, pos_y + 2 * BLOCK_SIZE, RESTART_BOX_MSG2, RESTART_BOX_MSG2_SIZE, FONT_SCALE, NORMAL_COLOR);
 
-    screen_draw_qrcode();
+    if (SHOW_QRCODE)
+        screen_draw_qrcode();
 }
 
 void clear_reset_msg(void)
@@ -277,9 +284,11 @@ void paint_qrcode(unsigned color)
 void screen_erase_qrcode(void)
 {
     paint_qrcode(BLACK_COLOR);
+    write_string(QR_CODE_POS_X - 1 * BLOCK_SIZE, QR_CODE_POS_Y - 2 * BLOCK_SIZE, "                   ", QR_CODE_TITLE_SIZE, QR_CODE_TITLE_FONT_SCALE, BLACK_COLOR);
 }
 
 void screen_draw_qrcode(void)
 {
     paint_qrcode(NORMAL_COLOR);
+    write_string(QR_CODE_POS_X - 1 * BLOCK_SIZE, QR_CODE_POS_Y - 2 * BLOCK_SIZE, QR_CODE_TITLE, QR_CODE_TITLE_SIZE, QR_CODE_TITLE_FONT_SCALE, NORMAL_COLOR);
 }

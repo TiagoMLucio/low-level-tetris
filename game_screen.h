@@ -86,11 +86,14 @@
 #define LEVEL_TITLE "LEVEL"
 #define LEVEL_TITLE_SIZE 5
 
+#define SHOW_QRCODE TRUE
 #define QR_CODE_SIZE 25
-#define QR_CODE_BLOCK_SIZE 14
+#define QR_CODE_BLOCK_SIZE 8
 #define QR_CODE_POS_X (RESTART_BOX_POS_X + RESTART_BOX_WIDTH * BLOCK_SIZE / 2 - QR_CODE_SIZE * QR_CODE_BLOCK_SIZE / 2)
-#define QR_CODE_POS_Y (RESTART_BOX_POS_Y + (RESTART_BOX_HEIGHT + 2) * BLOCK_SIZE)
-
+#define QR_CODE_POS_Y (RESTART_BOX_POS_Y + (RESTART_BOX_HEIGHT + 6) * BLOCK_SIZE)
+#define QR_CODE_TITLE "GITHUB REPOSITORY"
+#define QR_CODE_TITLE_SIZE 17
+#define QR_CODE_TITLE_FONT_SCALE (FONT_SCALE - 1)
 typedef unsigned blocks;
 
 typedef int Statistics[7];
@@ -116,6 +119,8 @@ void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str
 void draw_background(void);
 
 void reset_game_screen(void);
+
+void clear_cursor(void);
 
 void setup_type_frame(void);
 
