@@ -216,6 +216,7 @@ void reset_game_screen(void)
     screen_update_lines(0);
     screen_update_score(0);
     clear_reset_msg();
+    screen_erase_qrcode();
 }
 
 void display_reset_msg(void)
@@ -230,9 +231,55 @@ void display_reset_msg(void)
 
     write_string(RESTART_BOX_POS_X + BLOCK_SIZE + TEXT_GAP, pos_y, RESTART_BOX_MSG1, RESTART_BOX_MSG1_SIZE, FONT_SCALE, NORMAL_COLOR);
     write_string(RESTART_BOX_POS_X + BLOCK_SIZE + TEXT_GAP, pos_y + 2 * BLOCK_SIZE, RESTART_BOX_MSG2, RESTART_BOX_MSG2_SIZE, FONT_SCALE, NORMAL_COLOR);
+
+    screen_draw_qrcode();
 }
 
 void clear_reset_msg(void)
 {
     draw_square(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH * BLOCK_SIZE, 0);
+}
+
+int QR_CODE[QR_CODE_SIZE][QR_CODE_SIZE] = {{1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1},
+                                           {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
+                                           {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1},
+                                           {1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1},
+                                           {1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
+                                           {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                                           {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
+                                           {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                                           {1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0},
+                                           {0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0},
+                                           {1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0},
+                                           {0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1},
+                                           {1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1},
+                                           {0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1},
+                                           {1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1},
+                                           {0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
+                                           {1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1},
+                                           {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0},
+                                           {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1},
+                                           {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1},
+                                           {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0},
+                                           {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0},
+                                           {1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1},
+                                           {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1},
+                                           {1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1}};
+
+void paint_qrcode(unsigned color)
+{
+    for (int i = 0; i < QR_CODE_SIZE; i++)
+        for (int j = 0; j < QR_CODE_SIZE; j++)
+            if (QR_CODE[i][j])
+                draw_square(QR_CODE_POS_X + j * QR_CODE_BLOCK_SIZE, QR_CODE_POS_Y + i * QR_CODE_BLOCK_SIZE, QR_CODE_BLOCK_SIZE, color);
+}
+
+void screen_erase_qrcode(void)
+{
+    paint_qrcode(BLACK_COLOR);
+}
+
+void screen_draw_qrcode(void)
+{
+    paint_qrcode(NORMAL_COLOR);
 }

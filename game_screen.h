@@ -86,6 +86,11 @@
 #define LEVEL_TITLE "LEVEL"
 #define LEVEL_TITLE_SIZE 5
 
+#define QR_CODE_POS_X GAME_POS_X + GAME_WIDTH * BLOCK_SIZE + BLOCK_SIZE
+#define QR_CODE_POS_Y GAME_POS_Y
+#define QR_CODE_SIZE 25
+#define QR_CODE_BLOCK_SIZE 14
+
 typedef unsigned blocks;
 
 typedef int Statistics[7];
@@ -141,5 +146,11 @@ void screen_clear_next(void);
 void display_reset_msg(void);
 
 void clear_reset_msg(void);
+
+void paint_qrcode(unsigned color);
+
+void screen_erase_qrcode(void);
+
+void screen_draw_qrcode(void);
 
 #endif // GAME_SCREEN_H
