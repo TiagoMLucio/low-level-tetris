@@ -38,7 +38,7 @@ The USPi driver contains logging on the initialization of the driver, showing re
 
 For example, for a successful connection:
 
-![Successful connection: USPi library successfully initialized](./imgs/keyboard_found.jpeg)
+![Successful connection: USPi library successfully initialized](./assets/keyboard_found.jpeg)
 
 By default, we left logging disabled. If it is wanted to enable the logging, the makeall command should be the following:
 
