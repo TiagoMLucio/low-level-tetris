@@ -36,6 +36,9 @@ static const char *s_pExceptionName[] =
 
 static TExceptionHandler *s_pThis = 0;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
 void ExceptionHandler2 (TExceptionHandler *pThis)
 {
 	assert (pThis != 0);
@@ -44,7 +47,7 @@ void ExceptionHandler2 (TExceptionHandler *pThis)
 	s_pThis = pThis;
 
 	TExceptionTable *pTable = (TExceptionTable *) ARM_EXCEPTION_TABLE_BASE;
-
+	
 	pTable->UndefinedInstruction = ARM_OPCODE_BRANCH (ARM_DISTANCE (
 					pTable->UndefinedInstruction, UndefinedInstructionStub));
 

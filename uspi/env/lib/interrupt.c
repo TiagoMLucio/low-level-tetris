@@ -63,6 +63,9 @@ void _InterruptSystem (TInterruptSystem *pThis)
 	s_pThis = 0;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
 int InterruptSystemInitialize (TInterruptSystem *pThis)
 {
 	assert (pThis != 0);

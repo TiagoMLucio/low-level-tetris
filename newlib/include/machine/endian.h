@@ -20,11 +20,12 @@
 #define	BYTE_ORDER	_BYTE_ORDER
 #endif
 
+/*
 #ifdef __GNUC__
 #define	__bswap16(_x)	__builtin_bswap16(_x)
 #define	__bswap32(_x)	__builtin_bswap32(_x)
 #define	__bswap64(_x)	__builtin_bswap64(_x)
-#else /* __GNUC__ */
+#else
 static __inline __uint16_t
 __bswap16(__uint16_t _x)
 {
@@ -50,7 +51,8 @@ __bswap64(__uint64_t _x)
 	    ((_x << 24) & ((__uint64_t)0xff << 40)) |
 	    ((_x << 40) & ((__uint64_t)0xff << 48)) | ((_x << 56))));
 }
-#endif /* !__GNUC__ */
+#endif
+*/
 
 #ifndef __machine_host_to_from_network_defined
 #if _BYTE_ORDER == _LITTLE_ENDIAN

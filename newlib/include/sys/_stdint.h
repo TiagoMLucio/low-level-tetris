@@ -48,7 +48,7 @@ typedef __int32_t int32_t ;
 typedef __uint32_t uint32_t ;
 #define _UINT32_T_DECLARED
 #endif
-#define __int32_t_defined 1
+/* #define __int32_t_defined 1 */
 #endif /* ___int32_t_defined */
 
 #ifdef ___int64_t_defined
