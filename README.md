@@ -32,6 +32,12 @@ To remove all the generated files:
 ./makeall clean
 ```
 
+## Disk Images
+
+Despite the .img file generating methods described above, there are ready-to-use .img files inside the `disk_images` directory.
+
+The kernel8-32.img is used for Raspberry Pi 3 (8 from armv8-a, and 32 for the 32-bit architecture), and kernel7.img is for the Raspberry Pi 2 (7 from armv7).
+
 ## Logging
 
 The USPi driver contains logging on the initialization of the driver, showing relevant messages related to the keyboard integration. 
