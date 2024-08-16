@@ -14,7 +14,7 @@ void draw_game_block(blocks i, blocks j, unsigned size, unsigned color)
 
 void draw_block(unsigned x, unsigned y, unsigned size, unsigned color)
 {
-    draw_rect(x, y, size, size, 1, 0);
+    draw_frame(x, y, size, size, 1, 0);
     draw_square(x + 1, y + 1, size - 2, color);
 }
 
@@ -47,19 +47,36 @@ void draw_grid(void)
 
 void draw_outer_frame(blocks i, blocks j, blocks width, blocks height)
 {
-    draw_rect(block_position_x(j), block_position_y(i), width * BLOCK_SIZE, height * BLOCK_SIZE, FRAME_THICKNESS_PX, BG_MAIN_PALETTE);
+    draw_frame(block_position_x(j), block_position_y(i), width * BLOCK_SIZE, height * BLOCK_SIZE, FRAME_THICKNESS_PX, BG_MAIN_PALETTE);
 }
 
 void draw_inner_frame(blocks i, blocks j, blocks width, blocks height, boolean thick)
 {
     unsigned thickness = thick ? FRAME_THICKNESS_PX : SMALL_FRAME_THICKNESS_PX;
-    draw_rect(block_position_x(j) + FRAME_THICKNESS_PX, block_position_y(i) + FRAME_THICKNESS_PX, width * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, height * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, thickness, BG_SECONDARY_PALETTE);
+    draw_frame(block_position_x(j) + FRAME_THICKNESS_PX, block_position_y(i) + FRAME_THICKNESS_PX, width * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, height * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, thickness, BG_SECONDARY_PALETTE);
 }
 
 void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str, unsigned size, unsigned scale, unsigned color)
 {
     unsigned pos_y = block_position_y(i) - CHAR_HEIGHT / 2 + BLOCK_SIZE / 2;
     write_string(block_position_x(j) + diff_x, pos_y + diff_y, str, size, scale, color);
+}
+
+void draw_block_rect(blocks i, blocks j, blocks width, blocks height, unsigned color) {
+    draw_rect(block_position_x(j), block_position_y(i), width * BLOCK_SIZE, height * BLOCK_SIZE, color);
+}
+
+void draw_background(void)
+{
+    draw_block_rect(0, 0, GAME_WIDTH, GAME_HEIGHT, NORMAL_COLOR);
+
+    draw_block_rect(GAME_FRAME_I, GAME_FRAME_J, GAME_FRAME_WIDTH, GAME_FRAME_HEIGHT, BLACK_COLOR);
+    draw_block_rect(TYPE_FRAME_I, TYPE_FRAME_J, TYPE_FRAME_WIDTH, TYPE_FRAME_HEIGHT, BLACK_COLOR);
+    draw_block_rect(STATISTICS_FRAME_I, STATISTICS_FRAME_J, STATISTICS_FRAME_WIDTH, STATISTICS_FRAME_HEIGHT, BLACK_COLOR);
+    draw_block_rect(LINES_FRAME_I, LINES_FRAME_J, LINES_FRAME_WIDTH, LINES_FRAME_HEIGHT, BLACK_COLOR);
+    draw_block_rect(SCORE_FRAME_I, SCORE_FRAME_J, SCORE_FRAME_WIDTH, SCORE_FRAME_HEIGHT, BLACK_COLOR);
+    draw_block_rect(NEXT_FRAME_I, NEXT_FRAME_J, NEXT_FRAME_WIDTH, NEXT_FRAME_HEIGHT, BLACK_COLOR);
+    draw_block_rect(LEVEL_FRAME_I, LEVEL_FRAME_J, LEVEL_FRAME_WIDTH, LEVEL_FRAME_HEIGHT, BLACK_COLOR);
 }
 
 void setup_type_frame(void)
@@ -162,7 +179,7 @@ void screen_update_stats(Statistics stats)
 {
     int pos_x = STATISTICS_FRAME_I + 4;
     int pos_y = STATISTICS_FRAME_J + 4 + 2;
-    int diff_y = - BLOCK_SIZE / 2;
+    int diff_y = -BLOCK_SIZE / 2;
 
     for (int i = 0; i < 7; i++)
         write_title(pos_x + i * 2, pos_y, 0, diff_y, "   ", 3, FONT_SCALE, 0);
@@ -201,8 +218,8 @@ void reset_game_screen(void)
 void display_reset_msg(void)
 {
     clear_reset_msg();
-    draw_rect(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH * BLOCK_SIZE, RESTART_BOX_HEIGHT * BLOCK_SIZE, FRAME_THICKNESS_PX, BG_MAIN_PALETTE);
-    draw_rect(RESTART_BOX_POS_X + FRAME_THICKNESS_PX, RESTART_BOX_POS_Y + FRAME_THICKNESS_PX, RESTART_BOX_WIDTH * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, RESTART_BOX_HEIGHT * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, FRAME_THICKNESS_PX, BG_SECONDARY_PALETTE);
+    draw_frame(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH * BLOCK_SIZE, RESTART_BOX_HEIGHT * BLOCK_SIZE, FRAME_THICKNESS_PX, BG_MAIN_PALETTE);
+    draw_frame(RESTART_BOX_POS_X + FRAME_THICKNESS_PX, RESTART_BOX_POS_Y + FRAME_THICKNESS_PX, RESTART_BOX_WIDTH * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, RESTART_BOX_HEIGHT * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, FRAME_THICKNESS_PX, BG_SECONDARY_PALETTE);
 
     unsigned pos_y = RESTART_BOX_POS_Y + 2 * BLOCK_SIZE - CHAR_HEIGHT / 2 + BLOCK_SIZE / 2;
 

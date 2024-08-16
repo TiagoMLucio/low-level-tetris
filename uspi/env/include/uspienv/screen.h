@@ -58,6 +58,7 @@ extern "C" {
 	#define RED_COLOR16     		COLOR16(31, 0, 0)   // Vermelho
 	#define BG_MAIN_COLOR16			COLOR16(14, 14, 14)
 	#define BG_SECONDARY_COLOR16  	COLOR16(18, 31, 30)
+	#define BG_LIGHT_COLOR16   		COLOR16(20, 20, 20)
 
 	#define NORMAL_COLOR			1
 	#define HIGH_COLOR				2
@@ -71,6 +72,7 @@ extern "C" {
 	#define RED_PALETTE     		10
 	#define BG_MAIN_PALETTE  		11
 	#define BG_SECONDARY_PALETTE	12
+	#define BG_LIGHT_PALETTE        13
 #elif DEPTH == 16
 	typedef u16 TScreenColor;
 
@@ -79,7 +81,7 @@ extern "C" {
 	#define HALF_COLOR			COLOR16 (0, 0, 31)
 #elif DEPTH == 32
 	typedef u32 TScreenColor;
-
+RED
 	#define NORMAL_COLOR			COLOR32 (255, 255, 255, 255)
 	#define HIGH_COLOR			COLOR32 (255, 0, 0, 255)
 	#define HALF_COLOR			COLOR32 (0, 0, 255, 255)

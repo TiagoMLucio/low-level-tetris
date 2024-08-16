@@ -16,14 +16,14 @@
 
 static const char FromGame[] = "tetris";
 
-#define BASE_DELAY 250000; // micro seconds
-#define LINES_PER_LEVEL 5;
-#define SPEDUP_ROUNDS 2;
-#define SPEDUP_REDUCTION 3;
+#define BASE_DELAY 250000 // micro seconds
+#define LINES_PER_LEVEL 5
+#define SPEDUP_ROUNDS 2
+#define SPEDUP_REDUCTION 3
 
 unsigned const SCORE_PER_CLEAR[4] = {100, 300, 500, 800};
 unsigned grid[GAME_GRID_HEIGHT][GAME_GRID_WIDTH] = {0};
-unsigned delay = BASE_DELAY; 
+unsigned delay = BASE_DELAY;
 unsigned cur_delay = BASE_DELAY;
 
 unsigned spedup_rounds_left = 0;
@@ -297,6 +297,7 @@ void restart_game()
 
 void setup_game_screen(void)
 {
+   draw_background();
    setup_game_frame();
    setup_type_frame();
    setup_lines_frame();

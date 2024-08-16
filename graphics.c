@@ -13,7 +13,7 @@ void draw_line(int x, int y, int length, unsigned color, int thickness, boolean 
             fb_pixel(x + (vertical ? i : j), y + (vertical ? j : i), color);
 }
 
-void draw_rect(int x, int y, int width, int height, int thickness, unsigned color)
+void draw_frame(int x, int y, int width, int height, int thickness, unsigned color)
 {
     draw_line(x, y, height, color, thickness, 1);                     // left
     draw_line(x + width - thickness, y, height, color, thickness, 1); // right
@@ -21,11 +21,16 @@ void draw_rect(int x, int y, int width, int height, int thickness, unsigned colo
     draw_line(x, y + height - thickness, width, color, thickness, 0); // bottom
 }
 
+void draw_rect(int x, int y, int width, int height, unsigned color)
+{
+    for (int i = 0; i < height; i++)
+        for (int j = 0; j < width; j++)
+            fb_pixel(x + j, y + i, color);
+}
+
 void draw_square(int x, int y, unsigned size, unsigned color)
 {
-    for (int i = 0; i < size; i++)
-        for (int j = 0; j < size; j++)
-            fb_pixel(x + i, y + j, color);
+    draw_rect(x, y, size, size, color);
 }
 
 void write_string(unsigned x, unsigned y, const void *str, unsigned size, unsigned scale, unsigned color)

@@ -107,6 +107,7 @@ boolean ScreenDeviceInitialize (TScreenDevice *pThis)
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, RED_PALETTE, RED_COLOR16);
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, BG_MAIN_PALETTE, BG_MAIN_COLOR16);
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, BG_SECONDARY_PALETTE, BG_SECONDARY_COLOR16);
+	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, BG_LIGHT_PALETTE, BG_LIGHT_COLOR16);
 #endif
 	if (!BcmFrameBufferInitialize (pThis->m_pFrameBuffer))
 	{

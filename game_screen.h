@@ -91,6 +91,8 @@ typedef int Statistics[7];
 
 void draw_game_block(blocks i, blocks j, unsigned size, unsigned color);
 
+void draw_block_rect(blocks i, blocks j, blocks width, blocks height, unsigned color);
+
 void draw_block(unsigned x, unsigned y, unsigned size, unsigned color);
 
 void draw_grid_block(blocks i, blocks j, unsigned size, unsigned color);
@@ -104,6 +106,8 @@ void draw_outer_frame(blocks i, blocks j, blocks width, blocks height);
 void draw_inner_frame(blocks i, blocks j, blocks width, blocks height, boolean thick);
 
 void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str, unsigned size, unsigned scale, unsigned color);
+
+void draw_background(void);
 
 void reset_game_screen(void);
 
