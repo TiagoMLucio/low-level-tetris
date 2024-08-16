@@ -30,7 +30,3 @@ CFLAGS	+= -I $(USPIHOME)/env/include -I $(USPIHOME)/include \
 		   -I $(LIBGCCHOME)/plugin/include
 
 include $(USPIHOME)/Rules.mk
-
-clean:
-	rm -f *.o *.elf *.lst *.img *.cir *.map *~
-	rm -f $(USPIHOME)/env/lib/*.o 
