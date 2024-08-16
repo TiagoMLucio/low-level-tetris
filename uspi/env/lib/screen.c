@@ -3,7 +3,7 @@
 //
 // USPi - An USB driver for Raspberry Pi written in C
 // Copyright (C) 2014-2018  R. Stange <rsta2@o2online.de>
-// 
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,7 @@
 #include <uspienv/alloc.h>
 #include <uspienv/util.h>
 
-#define ROTORS		4
+#define ROTORS 4
 
 typedef enum TScreenState
 {
@@ -34,38 +34,37 @@ typedef enum TScreenState
 	ScreenStateSemicolon,
 	ScreenStateNumber2,
 	ScreenStateNumber3
-}
-TScreenState;
+} TScreenState;
 
-void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar);
-void ScreenDeviceCarriageReturn (TScreenDevice *pThis);
-void ScreenDeviceClearDisplayEnd (TScreenDevice *pThis) MAXOPT;
-void ScreenDeviceClearLineEnd (TScreenDevice *pThis);
-void ScreenDeviceCursorDown (TScreenDevice *pThis);
-void ScreenDeviceCursorHome (TScreenDevice *pThis);
-void ScreenDeviceCursorLeft (TScreenDevice *pThis);
-void ScreenDeviceCursorMove (TScreenDevice *pThis, unsigned nRow, unsigned nColumn);
-void ScreenDeviceCursorRight (TScreenDevice *pThis);
-void ScreenDeviceCursorUp (TScreenDevice *pThis);
-void ScreenDeviceDeleteChars (TScreenDevice *pThis, unsigned nCount);
-void ScreenDeviceDeleteLines (TScreenDevice *pThis, unsigned nCount);
-void ScreenDeviceDisplayChar (TScreenDevice *pThis, char chChar);
-void ScreenDeviceEraseChars (TScreenDevice *pThis, unsigned nCount);
-void ScreenDeviceInsertLines (TScreenDevice *pThis, unsigned nCount);
-void ScreenDeviceInsertMode (TScreenDevice *pThis, boolean bBegin);
-void ScreenDeviceNewLine (TScreenDevice *pThis);
-void ScreenDeviceReverseScroll (TScreenDevice *pThis);
-void ScreenDeviceSetCursorMode (TScreenDevice *pThis, boolean bVisible);
-void ScreenDeviceSetStandoutMode (TScreenDevice *pThis, unsigned nMode);
-void ScreenDeviceTabulator (TScreenDevice *pThis);
-void ScreenDeviceScroll (TScreenDevice *pThis) MAXOPT;
-void ScreenDeviceDisplayChar2 (TScreenDevice *pThis, char chChar, unsigned nPosX, unsigned nPosY, TScreenColor Color);
-void ScreenDeviceEraseChar (TScreenDevice *pThis, unsigned nPosX, unsigned nPosY);
-void ScreenDeviceInvertCursor (TScreenDevice *pThis);
+void ScreenDeviceWrite2(TScreenDevice *pThis, char chChar);
+void ScreenDeviceCarriageReturn(TScreenDevice *pThis);
+void ScreenDeviceClearDisplayEnd(TScreenDevice *pThis) MAXOPT;
+void ScreenDeviceClearLineEnd(TScreenDevice *pThis);
+void ScreenDeviceCursorDown(TScreenDevice *pThis);
+void ScreenDeviceCursorHome(TScreenDevice *pThis);
+void ScreenDeviceCursorLeft(TScreenDevice *pThis);
+void ScreenDeviceCursorMove(TScreenDevice *pThis, unsigned nRow, unsigned nColumn);
+void ScreenDeviceCursorRight(TScreenDevice *pThis);
+void ScreenDeviceCursorUp(TScreenDevice *pThis);
+void ScreenDeviceDeleteChars(TScreenDevice *pThis, unsigned nCount);
+void ScreenDeviceDeleteLines(TScreenDevice *pThis, unsigned nCount);
+void ScreenDeviceDisplayChar(TScreenDevice *pThis, char chChar);
+void ScreenDeviceEraseChars(TScreenDevice *pThis, unsigned nCount);
+void ScreenDeviceInsertLines(TScreenDevice *pThis, unsigned nCount);
+void ScreenDeviceInsertMode(TScreenDevice *pThis, boolean bBegin);
+void ScreenDeviceNewLine(TScreenDevice *pThis);
+void ScreenDeviceReverseScroll(TScreenDevice *pThis);
+void ScreenDeviceSetCursorMode(TScreenDevice *pThis, boolean bVisible);
+void ScreenDeviceSetStandoutMode(TScreenDevice *pThis, unsigned nMode);
+void ScreenDeviceTabulator(TScreenDevice *pThis);
+void ScreenDeviceScroll(TScreenDevice *pThis) MAXOPT;
+void ScreenDeviceDisplayChar2(TScreenDevice *pThis, char chChar, unsigned nPosX, unsigned nPosY, TScreenColor Color);
+void ScreenDeviceEraseChar(TScreenDevice *pThis, unsigned nPosX, unsigned nPosY);
+void ScreenDeviceInvertCursor(TScreenDevice *pThis);
 
-void ScreenDevice (TScreenDevice *pThis, unsigned nWidth, unsigned nHeight)
+void ScreenDevice(TScreenDevice *pThis, unsigned nWidth, unsigned nHeight)
 {
-	CharGenerator (&pThis->m_CharGen);
+	CharGenerator(&pThis->m_CharGen);
 
 	pThis->m_nInitWidth = nWidth;
 	pThis->m_nInitHeight = nHeight;
@@ -79,25 +78,25 @@ void ScreenDevice (TScreenDevice *pThis, unsigned nWidth, unsigned nHeight)
 	pThis->m_bInsertOn = FALSE;
 }
 
-void _ScreenDevice (TScreenDevice *pThis)
+void _ScreenDevice(TScreenDevice *pThis)
 {
 	pThis->m_pBuffer = 0;
-	
-	_BcmFrameBuffer (pThis->m_pFrameBuffer);
-	free (pThis->m_pFrameBuffer);
+
+	_BcmFrameBuffer(pThis->m_pFrameBuffer);
+	free(pThis->m_pFrameBuffer);
 	pThis->m_pFrameBuffer = 0;
 
-	_CharGenerator (&pThis->m_CharGen);
+	_CharGenerator(&pThis->m_CharGen);
 }
 
-boolean ScreenDeviceInitialize (TScreenDevice *pThis)
+boolean ScreenDeviceInitialize(TScreenDevice *pThis)
 {
-	pThis->m_pFrameBuffer = malloc (sizeof (TBcmFrameBuffer));
-	BcmFrameBuffer (pThis->m_pFrameBuffer, pThis->m_nInitWidth, pThis->m_nInitHeight, DEPTH);
+	pThis->m_pFrameBuffer = malloc(sizeof(TBcmFrameBuffer));
+	BcmFrameBuffer(pThis->m_pFrameBuffer, pThis->m_nInitWidth, pThis->m_nInitHeight, DEPTH);
 #if DEPTH == 8
-	BcmFrameBufferSetPalette (pThis->m_pFrameBuffer, NORMAL_COLOR, NORMAL_COLOR16);
-	BcmFrameBufferSetPalette (pThis->m_pFrameBuffer, HIGH_COLOR,   HIGH_COLOR16);
-	BcmFrameBufferSetPalette (pThis->m_pFrameBuffer, HALF_COLOR,   HALF_COLOR16);
+	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, NORMAL_COLOR, NORMAL_COLOR16);
+	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, HIGH_COLOR, HIGH_COLOR16);
+	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, HALF_COLOR, HALF_COLOR16);
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, CYAN_PALETTE, CYAN_COLOR16);
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, YELLOW_PALETTE, YELLOW_COLOR16);
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, PURPLE_PALETTE, PURPLE_COLOR16);
@@ -107,105 +106,100 @@ boolean ScreenDeviceInitialize (TScreenDevice *pThis)
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, RED_PALETTE, RED_COLOR16);
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, BG_MAIN_PALETTE, BG_MAIN_COLOR16);
 	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, BG_SECONDARY_PALETTE, BG_SECONDARY_COLOR16);
-	BcmFrameBufferSetPalette(pThis->m_pFrameBuffer, BG_LIGHT_PALETTE, BG_LIGHT_COLOR16);
 #endif
-	if (!BcmFrameBufferInitialize (pThis->m_pFrameBuffer))
+	if (!BcmFrameBufferInitialize(pThis->m_pFrameBuffer))
 	{
 		return FALSE;
 	}
 
-	if (BcmFrameBufferGetDepth (pThis->m_pFrameBuffer) != DEPTH)
+	if (BcmFrameBufferGetDepth(pThis->m_pFrameBuffer) != DEPTH)
 	{
 		return FALSE;
 	}
 
-	pThis->m_pBuffer = (TScreenColor *) BcmFrameBufferGetBuffer (pThis->m_pFrameBuffer);
-	pThis->m_nSize   = BcmFrameBufferGetSize (pThis->m_pFrameBuffer);
-	pThis->m_nWidth  = BcmFrameBufferGetWidth (pThis->m_pFrameBuffer);
-	pThis->m_nHeight = BcmFrameBufferGetHeight (pThis->m_pFrameBuffer);
+	pThis->m_pBuffer = (TScreenColor *)BcmFrameBufferGetBuffer(pThis->m_pFrameBuffer);
+	pThis->m_nSize = BcmFrameBufferGetSize(pThis->m_pFrameBuffer);
+	pThis->m_nWidth = BcmFrameBufferGetWidth(pThis->m_pFrameBuffer);
+	pThis->m_nHeight = BcmFrameBufferGetHeight(pThis->m_pFrameBuffer);
 
 	// Ensure that each row is word-aligned so that we can safely use memcpyblk()
-	if (BcmFrameBufferGetPitch (pThis->m_pFrameBuffer) % sizeof (u32) != 0)
+	if (BcmFrameBufferGetPitch(pThis->m_pFrameBuffer) % sizeof(u32) != 0)
 	{
 		return FALSE;
 	}
-	pThis->m_nPitch = BcmFrameBufferGetPitch (pThis->m_pFrameBuffer) / sizeof (TScreenColor);
+	pThis->m_nPitch = BcmFrameBufferGetPitch(pThis->m_pFrameBuffer) / sizeof(TScreenColor);
 
-	pThis->m_nUsedHeight =   pThis->m_nHeight
-			       / CharGeneratorGetCharHeight (&pThis->m_CharGen)
-			       * CharGeneratorGetCharHeight (&pThis->m_CharGen);
+	pThis->m_nUsedHeight = pThis->m_nHeight / CharGeneratorGetCharHeight(&pThis->m_CharGen) * CharGeneratorGetCharHeight(&pThis->m_CharGen);
 
-	ScreenDeviceCursorHome (pThis);
-	ScreenDeviceClearDisplayEnd (pThis);
-	ScreenDeviceInvertCursor (pThis);
+	ScreenDeviceCursorHome(pThis);
+	ScreenDeviceClearDisplayEnd(pThis);
+	ScreenDeviceInvertCursor(pThis);
 
 	return TRUE;
 }
 
-unsigned ScreenDeviceGetWidth (TScreenDevice *pThis)
+unsigned ScreenDeviceGetWidth(TScreenDevice *pThis)
 {
 	return pThis->m_nWidth;
 }
 
-unsigned ScreenDeviceGetHeight (TScreenDevice *pThis)
+unsigned ScreenDeviceGetHeight(TScreenDevice *pThis)
 {
 	return pThis->m_nHeight;
 }
 
-int ScreenDeviceWrite (TScreenDevice *pThis, const void *pBuffer, unsigned nCount)
+int ScreenDeviceWrite(TScreenDevice *pThis, const void *pBuffer, unsigned nCount)
 {
-	ScreenDeviceInvertCursor (pThis);
-	
-	const char *pChar = (const char *) pBuffer;
+	ScreenDeviceInvertCursor(pThis);
+
+	const char *pChar = (const char *)pBuffer;
 	int nResult = 0;
 
 	while (nCount--)
 	{
-		ScreenDeviceWrite2 (pThis, *pChar++);
+		ScreenDeviceWrite2(pThis, *pChar++);
 
 		nResult++;
 	}
 
-	ScreenDeviceInvertCursor (pThis);
-	
-	DataMemBarrier ();
+	ScreenDeviceInvertCursor(pThis);
+
+	DataMemBarrier();
 
 	return nResult;
 }
 
-void ScreenDeviceSetPixel (TScreenDevice *pThis, unsigned nPosX, unsigned nPosY, TScreenColor Color)
+void ScreenDeviceSetPixel(TScreenDevice *pThis, unsigned nPosX, unsigned nPosY, TScreenColor Color)
 {
-	if (   nPosX < pThis->m_nWidth
-	    && nPosY < pThis->m_nHeight)
+	if (nPosX < pThis->m_nWidth && nPosY < pThis->m_nHeight)
 	{
 		pThis->m_pBuffer[pThis->m_nPitch * nPosY + nPosX] = Color;
 	}
 }
 
-TScreenColor ScreenDeviceGetPixel (TScreenDevice *pThis, unsigned nPosX, unsigned nPosY)
+TScreenColor ScreenDeviceGetPixel(TScreenDevice *pThis, unsigned nPosX, unsigned nPosY)
 {
-	if (   nPosX < pThis->m_nWidth
-	    && nPosY < pThis->m_nHeight)
+	if (nPosX < pThis->m_nWidth && nPosY < pThis->m_nHeight)
 	{
 		return pThis->m_pBuffer[pThis->m_nPitch * nPosY + nPosX];
 	}
-	
+
 	return BLACK_COLOR;
 }
 
-void ScreenDeviceRotor (TScreenDevice *pThis, unsigned nIndex, unsigned nCount)
+void ScreenDeviceRotor(TScreenDevice *pThis, unsigned nIndex, unsigned nCount)
 {
 	static const char chChars[] = "-\\|/";
 
 	nIndex %= ROTORS;
-	nCount &= 4-1;
+	nCount &= 4 - 1;
 
-	unsigned nPosX = pThis->m_nWidth - (nIndex + 1) * CharGeneratorGetCharWidth (&pThis->m_CharGen);
+	unsigned nPosX = pThis->m_nWidth - (nIndex + 1) * CharGeneratorGetCharWidth(&pThis->m_CharGen);
 
-	ScreenDeviceDisplayChar2 (pThis, chChars[nCount], nPosX, 0, HIGH_COLOR);
+	ScreenDeviceDisplayChar2(pThis, chChars[nCount], nPosX, 0, HIGH_COLOR);
 }
 
-void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
+void ScreenDeviceWrite2(TScreenDevice *pThis, char chChar)
 {
 	switch (pThis->m_nState)
 	{
@@ -213,19 +207,19 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 		switch (chChar)
 		{
 		case '\b':
-			ScreenDeviceCursorLeft (pThis);
+			ScreenDeviceCursorLeft(pThis);
 			break;
 
 		case '\t':
-			ScreenDeviceTabulator (pThis);
+			ScreenDeviceTabulator(pThis);
 			break;
 
 		case '\n':
-			ScreenDeviceNewLine (pThis);
+			ScreenDeviceNewLine(pThis);
 			break;
 
 		case '\r':
-			ScreenDeviceCarriageReturn (pThis);
+			ScreenDeviceCarriageReturn(pThis);
 			break;
 
 		case '\x1b':
@@ -233,7 +227,7 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 			break;
 
 		default:
-			ScreenDeviceDisplayChar (pThis, chChar);
+			ScreenDeviceDisplayChar(pThis, chChar);
 			break;
 		}
 		break;
@@ -242,7 +236,7 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 		switch (chChar)
 		{
 		case 'M':
-			ScreenDeviceReverseScroll (pThis);
+			ScreenDeviceReverseScroll(pThis);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
@@ -264,47 +258,47 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 			break;
 
 		case 'A':
-			ScreenDeviceCursorUp (pThis);
+			ScreenDeviceCursorUp(pThis);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'B':
-			ScreenDeviceCursorDown (pThis);
+			ScreenDeviceCursorDown(pThis);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'C':
-			ScreenDeviceCursorRight (pThis);
+			ScreenDeviceCursorRight(pThis);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'H':
-			ScreenDeviceCursorHome (pThis);
+			ScreenDeviceCursorHome(pThis);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'J':
-			ScreenDeviceClearDisplayEnd (pThis);
+			ScreenDeviceClearDisplayEnd(pThis);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'K':
-			ScreenDeviceClearLineEnd (pThis);
+			ScreenDeviceClearLineEnd(pThis);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'L':
-			ScreenDeviceInsertLines (pThis, 1);
+			ScreenDeviceInsertLines(pThis, 1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'M':
-			ScreenDeviceDeleteLines (pThis, 1);
+			ScreenDeviceDeleteLines(pThis, 1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'P':
-			ScreenDeviceDeleteChars (pThis, 1);
+			ScreenDeviceDeleteChars(pThis, 1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
@@ -330,22 +324,22 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 			break;
 
 		case 'L':
-			ScreenDeviceInsertLines (pThis, pThis->m_nParam1);
+			ScreenDeviceInsertLines(pThis, pThis->m_nParam1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'M':
-			ScreenDeviceDeleteLines (pThis, pThis->m_nParam1);
+			ScreenDeviceDeleteLines(pThis, pThis->m_nParam1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'P':
-			ScreenDeviceDeleteChars (pThis, pThis->m_nParam1);
+			ScreenDeviceDeleteChars(pThis, pThis->m_nParam1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
 		case 'X':
-			ScreenDeviceEraseChars (pThis, pThis->m_nParam1);
+			ScreenDeviceEraseChars(pThis, pThis->m_nParam1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
@@ -353,13 +347,13 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 		case 'l':
 			if (pThis->m_nParam1 == 4)
 			{
-				ScreenDeviceInsertMode (pThis, chChar == 'h');
+				ScreenDeviceInsertMode(pThis, chChar == 'h');
 			}
 			pThis->m_nState = ScreenStateStart;
 			break;
-			
+
 		case 'm':
-			ScreenDeviceSetStandoutMode (pThis, pThis->m_nParam1);
+			ScreenDeviceSetStandoutMode(pThis, pThis->m_nParam1);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
@@ -410,7 +404,7 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 		switch (chChar)
 		{
 		case 'H':
-			ScreenDeviceCursorMove (pThis, pThis->m_nParam1, pThis->m_nParam2);
+			ScreenDeviceCursorMove(pThis, pThis->m_nParam1, pThis->m_nParam2);
 			pThis->m_nState = ScreenStateStart;
 			break;
 
@@ -440,7 +434,7 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 		case 'l':
 			if (pThis->m_nParam1 == 25)
 			{
-				ScreenDeviceSetCursorMode (pThis, chChar == 'h');
+				ScreenDeviceSetCursorMode(pThis, chChar == 'h');
 			}
 			pThis->m_nState = ScreenStateStart;
 			break;
@@ -470,23 +464,23 @@ void ScreenDeviceWrite2 (TScreenDevice *pThis, char chChar)
 	}
 }
 
-void ScreenDeviceCarriageReturn (TScreenDevice *pThis)
+void ScreenDeviceCarriageReturn(TScreenDevice *pThis)
 {
 	pThis->m_nCursorX = 0;
 }
 
-void ScreenDeviceClearDisplayEnd (TScreenDevice *pThis)
+void ScreenDeviceClearDisplayEnd(TScreenDevice *pThis)
 {
-	ScreenDeviceClearLineEnd (pThis);
-	
-	unsigned nPosY = pThis->m_nCursorY + CharGeneratorGetCharHeight (&pThis->m_CharGen);
+	ScreenDeviceClearLineEnd(pThis);
+
+	unsigned nPosY = pThis->m_nCursorY + CharGeneratorGetCharHeight(&pThis->m_CharGen);
 	unsigned nOffset = nPosY * pThis->m_nPitch;
-	
+
 	TScreenColor *pBuffer = pThis->m_pBuffer + nOffset;
-	unsigned nSize = pThis->m_nSize / sizeof (TScreenColor) - nOffset;
+	unsigned nSize = pThis->m_nSize / sizeof(TScreenColor) - nOffset;
 
 #if BLACK_COLOR == 0
-	memset (pBuffer, 0, nSize * sizeof (TScreenColor));
+	memset(pBuffer, 0, nSize * sizeof(TScreenColor));
 #else
 	while (nSize--)
 	{
@@ -495,148 +489,145 @@ void ScreenDeviceClearDisplayEnd (TScreenDevice *pThis)
 #endif
 }
 
-void ScreenDeviceClearLineEnd (TScreenDevice *pThis)
+void ScreenDeviceClearLineEnd(TScreenDevice *pThis)
 {
-	for (unsigned nPosX = pThis->m_nCursorX; nPosX < pThis->m_nWidth; nPosX += CharGeneratorGetCharWidth (&pThis->m_CharGen))
+	for (unsigned nPosX = pThis->m_nCursorX; nPosX < pThis->m_nWidth; nPosX += CharGeneratorGetCharWidth(&pThis->m_CharGen))
 	{
-		ScreenDeviceEraseChar (pThis, nPosX, pThis->m_nCursorY);
+		ScreenDeviceEraseChar(pThis, nPosX, pThis->m_nCursorY);
 	}
 }
 
-void ScreenDeviceCursorDown (TScreenDevice *pThis)
+void ScreenDeviceCursorDown(TScreenDevice *pThis)
 {
-	pThis->m_nCursorY += CharGeneratorGetCharHeight (&pThis->m_CharGen);
+	pThis->m_nCursorY += CharGeneratorGetCharHeight(&pThis->m_CharGen);
 	if (pThis->m_nCursorY >= pThis->m_nUsedHeight)
 	{
-		ScreenDeviceScroll (pThis);
+		ScreenDeviceScroll(pThis);
 
-		pThis->m_nCursorY -= CharGeneratorGetCharHeight (&pThis->m_CharGen);
+		pThis->m_nCursorY -= CharGeneratorGetCharHeight(&pThis->m_CharGen);
 	}
 }
 
-void ScreenDeviceCursorHome (TScreenDevice *pThis)
+void ScreenDeviceCursorHome(TScreenDevice *pThis)
 {
 	pThis->m_nCursorX = 0;
 	pThis->m_nCursorY = 0;
 }
 
-void ScreenDeviceCursorLeft (TScreenDevice *pThis)
+void ScreenDeviceCursorLeft(TScreenDevice *pThis)
 {
 	if (pThis->m_nCursorX > 0)
 	{
-		pThis->m_nCursorX -= CharGeneratorGetCharWidth (&pThis->m_CharGen);
+		pThis->m_nCursorX -= CharGeneratorGetCharWidth(&pThis->m_CharGen);
 	}
 	else
 	{
 		if (pThis->m_nCursorY > 0)
 		{
-			pThis->m_nCursorX = pThis->m_nWidth - CharGeneratorGetCharWidth (&pThis->m_CharGen);
-			pThis->m_nCursorY -= CharGeneratorGetCharHeight (&pThis->m_CharGen);
+			pThis->m_nCursorX = pThis->m_nWidth - CharGeneratorGetCharWidth(&pThis->m_CharGen);
+			pThis->m_nCursorY -= CharGeneratorGetCharHeight(&pThis->m_CharGen);
 		}
 	}
 }
 
-void ScreenDeviceCursorMove (TScreenDevice *pThis, unsigned nRow, unsigned nColumn)
+void ScreenDeviceCursorMove(TScreenDevice *pThis, unsigned nRow, unsigned nColumn)
 {
-	unsigned nPosX = (nColumn - 1) * CharGeneratorGetCharWidth (&pThis->m_CharGen);
-	unsigned nPosY = (nRow - 1) * CharGeneratorGetCharHeight (&pThis->m_CharGen);
+	unsigned nPosX = (nColumn - 1) * CharGeneratorGetCharWidth(&pThis->m_CharGen);
+	unsigned nPosY = (nRow - 1) * CharGeneratorGetCharHeight(&pThis->m_CharGen);
 
-	if (   nPosX < pThis->m_nWidth
-	    && nPosY < pThis->m_nUsedHeight)
+	if (nPosX < pThis->m_nWidth && nPosY < pThis->m_nUsedHeight)
 	{
 		pThis->m_nCursorX = nPosX;
 		pThis->m_nCursorY = nPosY;
 	}
 }
 
-void ScreenDeviceCursorRight (TScreenDevice *pThis)
+void ScreenDeviceCursorRight(TScreenDevice *pThis)
 {
-	pThis->m_nCursorX += CharGeneratorGetCharWidth (&pThis->m_CharGen);
+	pThis->m_nCursorX += CharGeneratorGetCharWidth(&pThis->m_CharGen);
 	if (pThis->m_nCursorX >= pThis->m_nWidth)
 	{
-		ScreenDeviceNewLine (pThis);
+		ScreenDeviceNewLine(pThis);
 	}
 }
 
-void ScreenDeviceCursorUp (TScreenDevice *pThis)
+void ScreenDeviceCursorUp(TScreenDevice *pThis)
 {
-	if (pThis->m_nCursorY >= CharGeneratorGetCharHeight (&pThis->m_CharGen))
+	if (pThis->m_nCursorY >= CharGeneratorGetCharHeight(&pThis->m_CharGen))
 	{
-		pThis->m_nCursorY -= CharGeneratorGetCharHeight (&pThis->m_CharGen);
+		pThis->m_nCursorY -= CharGeneratorGetCharHeight(&pThis->m_CharGen);
 	}
 }
 
-void ScreenDeviceDeleteChars (TScreenDevice *pThis, unsigned nCount)	// TODO
+void ScreenDeviceDeleteChars(TScreenDevice *pThis, unsigned nCount) // TODO
 {
 }
 
-void ScreenDeviceDeleteLines (TScreenDevice *pThis, unsigned nCount)	// TODO
+void ScreenDeviceDeleteLines(TScreenDevice *pThis, unsigned nCount) // TODO
 {
 }
 
-void ScreenDeviceDisplayChar (TScreenDevice *pThis, char chChar)
+void ScreenDeviceDisplayChar(TScreenDevice *pThis, char chChar)
 {
 	// TODO: Insert mode
-	
-	if (' ' <= (unsigned char) chChar)
-	{
-		ScreenDeviceDisplayChar2 (pThis, chChar, pThis->m_nCursorX, pThis->m_nCursorY, pThis->m_Color);
 
-		ScreenDeviceCursorRight (pThis);
+	if (' ' <= (unsigned char)chChar)
+	{
+		ScreenDeviceDisplayChar2(pThis, chChar, pThis->m_nCursorX, pThis->m_nCursorY, pThis->m_Color);
+
+		ScreenDeviceCursorRight(pThis);
 	}
 }
 
-void ScreenDeviceEraseChars (TScreenDevice *pThis, unsigned nCount)
+void ScreenDeviceEraseChars(TScreenDevice *pThis, unsigned nCount)
 {
 	if (nCount == 0)
 	{
 		return;
 	}
 
-	unsigned nEndX = pThis->m_nCursorX + nCount * CharGeneratorGetCharWidth (&pThis->m_CharGen);
+	unsigned nEndX = pThis->m_nCursorX + nCount * CharGeneratorGetCharWidth(&pThis->m_CharGen);
 	if (nEndX > pThis->m_nWidth)
 	{
 		nEndX = pThis->m_nWidth;
 	}
 
-	for (unsigned nPosX = pThis->m_nCursorX; nPosX < nEndX; nPosX += CharGeneratorGetCharWidth (&pThis->m_CharGen))
+	for (unsigned nPosX = pThis->m_nCursorX; nPosX < nEndX; nPosX += CharGeneratorGetCharWidth(&pThis->m_CharGen))
 	{
-		ScreenDeviceEraseChar (pThis, nPosX, pThis->m_nCursorY);
+		ScreenDeviceEraseChar(pThis, nPosX, pThis->m_nCursorY);
 	}
 }
 
-void ScreenDeviceInsertLines (TScreenDevice *pThis, unsigned nCount)	// TODO
+void ScreenDeviceInsertLines(TScreenDevice *pThis, unsigned nCount) // TODO
 {
 }
 
-void ScreenDeviceInsertMode (TScreenDevice *pThis, boolean bBegin)
+void ScreenDeviceInsertMode(TScreenDevice *pThis, boolean bBegin)
 {
 	pThis->m_bInsertOn = bBegin;
 }
 
-void ScreenDeviceNewLine (TScreenDevice *pThis)
+void ScreenDeviceNewLine(TScreenDevice *pThis)
 {
-	ScreenDeviceCarriageReturn (pThis);
-	ScreenDeviceCursorDown (pThis);
+	ScreenDeviceCarriageReturn(pThis);
+	ScreenDeviceCursorDown(pThis);
 }
 
-void ScreenDeviceReverseScroll (TScreenDevice *pThis)
+void ScreenDeviceReverseScroll(TScreenDevice *pThis)
 {
-	if (   pThis->m_nCursorX == 0
-	    && pThis->m_nCursorY == 0
-	)
+	if (pThis->m_nCursorX == 0 && pThis->m_nCursorY == 0)
 	{
-		ScreenDeviceInsertLines (pThis, 1);
+		ScreenDeviceInsertLines(pThis, 1);
 	}
 }
 
-void ScreenDeviceSetCursorMode (TScreenDevice *pThis, boolean bVisible)
+void ScreenDeviceSetCursorMode(TScreenDevice *pThis, boolean bVisible)
 {
 	pThis->m_bCursorOn = bVisible;
 }
 
 // TODO: standout mode should be useable together with one other mode
-void ScreenDeviceSetStandoutMode (TScreenDevice *pThis, unsigned nMode)
+void ScreenDeviceSetStandoutMode(TScreenDevice *pThis, unsigned nMode)
 {
 	switch (nMode)
 	{
@@ -644,7 +635,7 @@ void ScreenDeviceSetStandoutMode (TScreenDevice *pThis, unsigned nMode)
 	case 27:
 		pThis->m_Color = NORMAL_COLOR;
 		break;
-		
+
 	case 1:
 		pThis->m_Color = HIGH_COLOR;
 		break;
@@ -653,41 +644,41 @@ void ScreenDeviceSetStandoutMode (TScreenDevice *pThis, unsigned nMode)
 		pThis->m_Color = HALF_COLOR;
 		break;
 
-	case 7:				// TODO: reverse mode
+	case 7: // TODO: reverse mode
 	default:
 		break;
 	}
 }
 
-void ScreenDeviceTabulator (TScreenDevice *pThis)
+void ScreenDeviceTabulator(TScreenDevice *pThis)
 {
-	unsigned nTabWidth = CharGeneratorGetCharWidth (&pThis->m_CharGen) * 8;
-	
+	unsigned nTabWidth = CharGeneratorGetCharWidth(&pThis->m_CharGen) * 8;
+
 	pThis->m_nCursorX = ((pThis->m_nCursorX + nTabWidth) / nTabWidth) * nTabWidth;
 	if (pThis->m_nCursorX >= pThis->m_nWidth)
 	{
-		ScreenDeviceNewLine (pThis);
+		ScreenDeviceNewLine(pThis);
 	}
 }
 
-void ScreenDeviceScroll (TScreenDevice *pThis)
+void ScreenDeviceScroll(TScreenDevice *pThis)
 {
-	unsigned nLines = CharGeneratorGetCharHeight (&pThis->m_CharGen);
+	unsigned nLines = CharGeneratorGetCharHeight(&pThis->m_CharGen);
 
-	u32 *pTo = (u32 *) pThis->m_pBuffer;
-	u32 *pFrom = (u32 *) (pThis->m_pBuffer + nLines * pThis->m_nPitch);
+	u32 *pTo = (u32 *)pThis->m_pBuffer;
+	u32 *pFrom = (u32 *)(pThis->m_pBuffer + nLines * pThis->m_nPitch);
 
-	unsigned nSize = pThis->m_nPitch * (pThis->m_nUsedHeight - nLines) * sizeof (TScreenColor);
+	unsigned nSize = pThis->m_nPitch * (pThis->m_nUsedHeight - nLines) * sizeof(TScreenColor);
 	unsigned nSizeBlk = nSize & ~0xFF;
 
-	memcpyblk (pTo, pFrom, nSizeBlk);
+	memcpyblk(pTo, pFrom, nSizeBlk);
 	// Handle framebuffers with row lengths not aligned to 16 bytes
-	memcpy ((char *)pTo + nSizeBlk, (char *)pFrom + nSizeBlk, nSize & 0xFF);
-	pTo += nSize / sizeof (u32);
+	memcpy((char *)pTo + nSizeBlk, (char *)pFrom + nSizeBlk, nSize & 0xFF);
+	pTo += nSize / sizeof(u32);
 
-	nSize = pThis->m_nPitch * nLines * sizeof (TScreenColor) / sizeof (u32);
+	nSize = pThis->m_nPitch * nLines * sizeof(TScreenColor) / sizeof(u32);
 #if BLACK_COLOR == 0
-	memset (pTo, 0, nSize * sizeof (u32));
+	memset(pTo, 0, nSize * sizeof(u32));
 #else
 	while (nSize--)
 	{
@@ -696,47 +687,47 @@ void ScreenDeviceScroll (TScreenDevice *pThis)
 #endif
 }
 
-void ScreenDeviceDisplayChar2 (TScreenDevice *pThis, char chChar, unsigned nPosX, unsigned nPosY, TScreenColor Color)
+void ScreenDeviceDisplayChar2(TScreenDevice *pThis, char chChar, unsigned nPosX, unsigned nPosY, TScreenColor Color)
 {
-	for (unsigned y = 0; y < CharGeneratorGetCharHeight (&pThis->m_CharGen); y++)
+	for (unsigned y = 0; y < CharGeneratorGetCharHeight(&pThis->m_CharGen); y++)
 	{
-		for (unsigned x = 0; x < CharGeneratorGetCharWidth (&pThis->m_CharGen); x++)
+		for (unsigned x = 0; x < CharGeneratorGetCharWidth(&pThis->m_CharGen); x++)
 		{
-			ScreenDeviceSetPixel (pThis, nPosX + x, nPosY + y,
-				  CharGeneratorGetPixel (&pThis->m_CharGen, chChar, x, y) ? Color : BLACK_COLOR);
+			ScreenDeviceSetPixel(pThis, nPosX + x, nPosY + y,
+								 CharGeneratorGetPixel(&pThis->m_CharGen, chChar, x, y) ? Color : BLACK_COLOR);
 		}
 	}
 }
 
-void ScreenDeviceEraseChar (TScreenDevice *pThis, unsigned nPosX, unsigned nPosY)
+void ScreenDeviceEraseChar(TScreenDevice *pThis, unsigned nPosX, unsigned nPosY)
 {
-	for (unsigned y = 0; y < CharGeneratorGetCharHeight (&pThis->m_CharGen); y++)
+	for (unsigned y = 0; y < CharGeneratorGetCharHeight(&pThis->m_CharGen); y++)
 	{
-		for (unsigned x = 0; x < CharGeneratorGetCharWidth (&pThis->m_CharGen); x++)
+		for (unsigned x = 0; x < CharGeneratorGetCharWidth(&pThis->m_CharGen); x++)
 		{
-			ScreenDeviceSetPixel (pThis, nPosX + x, nPosY + y, BLACK_COLOR);
+			ScreenDeviceSetPixel(pThis, nPosX + x, nPosY + y, BLACK_COLOR);
 		}
 	}
 }
 
-void ScreenDeviceInvertCursor (TScreenDevice *pThis)
+void ScreenDeviceInvertCursor(TScreenDevice *pThis)
 {
 	if (!pThis->m_bCursorOn)
 	{
 		return;
 	}
-	
-	for (unsigned y = CharGeneratorGetUnderline (&pThis->m_CharGen); y < CharGeneratorGetCharHeight (&pThis->m_CharGen); y++)
+
+	for (unsigned y = CharGeneratorGetUnderline(&pThis->m_CharGen); y < CharGeneratorGetCharHeight(&pThis->m_CharGen); y++)
 	{
-		for (unsigned x = 0; x < CharGeneratorGetCharWidth (&pThis->m_CharGen); x++)
+		for (unsigned x = 0; x < CharGeneratorGetCharWidth(&pThis->m_CharGen); x++)
 		{
-			if (ScreenDeviceGetPixel (pThis, pThis->m_nCursorX + x, pThis->m_nCursorY + y) == BLACK_COLOR)
+			if (ScreenDeviceGetPixel(pThis, pThis->m_nCursorX + x, pThis->m_nCursorY + y) == BLACK_COLOR)
 			{
-				ScreenDeviceSetPixel (pThis, pThis->m_nCursorX + x, pThis->m_nCursorY + y, pThis->m_Color);
+				ScreenDeviceSetPixel(pThis, pThis->m_nCursorX + x, pThis->m_nCursorY + y, pThis->m_Color);
 			}
 			else
 			{
-				ScreenDeviceSetPixel (pThis, pThis->m_nCursorX + x, pThis->m_nCursorY + y, BLACK_COLOR);
+				ScreenDeviceSetPixel(pThis, pThis->m_nCursorX + x, pThis->m_nCursorY + y, BLACK_COLOR);
 			}
 		}
 	}

@@ -7,6 +7,7 @@
 
 #define ROTATIONS 4
 #define ROTATION_GRID_SIZE 4
+#define BACKGROUND_TILE_TICKNESS 4
 
 typedef struct
 {
@@ -16,14 +17,24 @@ typedef struct
     unsigned show_width;
 } TileType;
 
-extern TileType TILE_TYPES[];
-
 typedef struct
 {
     int type;
     int rotation;
     int x, y;
 } Tile;
+
+typedef struct
+{
+    unsigned type;
+    unsigned rotation;
+    unsigned i;
+    unsigned j;
+} BackgroundTile;
+
+extern TileType TILE_TYPES[];
+extern BackgroundTile BACKGROUND_TILES[];
+extern size_t BACKGROUND_TILES_SIZE;
 
 // Function declarations
 void draw_tile(Tile tile, unsigned color);
@@ -38,5 +49,7 @@ int get_tile_color(Tile tile);
 void screen_update_next(Tile tile);
 void draw_statistics_tile(TileType tile_type, unsigned i);
 void draw_statistics_tiles(void);
+void draw_background_tile(BackgroundTile tile);
+void draw_background_tiles(void);
 
 #endif // TILE_H

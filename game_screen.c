@@ -48,12 +48,14 @@ void draw_grid(void)
 void draw_outer_frame(blocks i, blocks j, blocks width, blocks height)
 {
     draw_frame(block_position_x(j), block_position_y(i), width * BLOCK_SIZE, height * BLOCK_SIZE, FRAME_THICKNESS_PX, BG_MAIN_PALETTE);
+    draw_frame(block_position_x(j), block_position_y(i), width * BLOCK_SIZE, height * BLOCK_SIZE, BLACK_FRAME_THICKNESS_PX, BLACK_COLOR);
 }
 
 void draw_inner_frame(blocks i, blocks j, blocks width, blocks height, boolean thick)
 {
     unsigned thickness = thick ? FRAME_THICKNESS_PX : SMALL_FRAME_THICKNESS_PX;
     draw_frame(block_position_x(j) + FRAME_THICKNESS_PX, block_position_y(i) + FRAME_THICKNESS_PX, width * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, height * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, thickness, BG_SECONDARY_PALETTE);
+    draw_frame(block_position_x(j) + FRAME_THICKNESS_PX, block_position_y(i) + FRAME_THICKNESS_PX, width * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, height * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, BLACK_FRAME_THICKNESS_PX, BLACK_COLOR);
 }
 
 void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str, unsigned size, unsigned scale, unsigned color)
@@ -62,13 +64,14 @@ void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str
     write_string(block_position_x(j) + diff_x, pos_y + diff_y, str, size, scale, color);
 }
 
-void draw_block_rect(blocks i, blocks j, blocks width, blocks height, unsigned color) {
+void draw_block_rect(blocks i, blocks j, blocks width, blocks height, unsigned color)
+{
     draw_rect(block_position_x(j), block_position_y(i), width * BLOCK_SIZE, height * BLOCK_SIZE, color);
 }
 
 void draw_background(void)
 {
-    draw_block_rect(0, 0, GAME_WIDTH, GAME_HEIGHT, NORMAL_COLOR);
+    draw_block_rect(0, 0, GAME_WIDTH, GAME_HEIGHT, BG_MAIN_PALETTE);
 
     draw_block_rect(GAME_FRAME_I, GAME_FRAME_J, GAME_FRAME_WIDTH, GAME_FRAME_HEIGHT, BLACK_COLOR);
     draw_block_rect(TYPE_FRAME_I, TYPE_FRAME_J, TYPE_FRAME_WIDTH, TYPE_FRAME_HEIGHT, BLACK_COLOR);
@@ -219,7 +222,9 @@ void display_reset_msg(void)
 {
     clear_reset_msg();
     draw_frame(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH * BLOCK_SIZE, RESTART_BOX_HEIGHT * BLOCK_SIZE, FRAME_THICKNESS_PX, BG_MAIN_PALETTE);
+    draw_frame(RESTART_BOX_POS_X, RESTART_BOX_POS_Y, RESTART_BOX_WIDTH * BLOCK_SIZE, RESTART_BOX_HEIGHT * BLOCK_SIZE, BLACK_FRAME_THICKNESS_PX, BLACK_COLOR);
     draw_frame(RESTART_BOX_POS_X + FRAME_THICKNESS_PX, RESTART_BOX_POS_Y + FRAME_THICKNESS_PX, RESTART_BOX_WIDTH * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, RESTART_BOX_HEIGHT * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, FRAME_THICKNESS_PX, BG_SECONDARY_PALETTE);
+    draw_frame(RESTART_BOX_POS_X + FRAME_THICKNESS_PX, RESTART_BOX_POS_Y + FRAME_THICKNESS_PX, RESTART_BOX_WIDTH * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, RESTART_BOX_HEIGHT * BLOCK_SIZE - 2 * FRAME_THICKNESS_PX, BLACK_FRAME_THICKNESS_PX, BLACK_COLOR);
 
     unsigned pos_y = RESTART_BOX_POS_Y + 2 * BLOCK_SIZE - CHAR_HEIGHT / 2 + BLOCK_SIZE / 2;
 
