@@ -3,10 +3,12 @@
 
 #include <uspienv.h>
 #include "graphics.h"
+#include "tile.h"
 
 #define FONT_SCALE 3
 
 #define BLOCK_SIZE 28
+#define LITTLE_BLOCK_SIZE 24
 #define GAME_WIDTH 32
 #define GAME_HEIGHT 28
 #define GAME_DISPLACEMENT_X 8 * BLOCK_SIZE
@@ -85,25 +87,23 @@
 
 typedef unsigned blocks;
 
-// Draw a block in the game screen
-void draw_game_block(unsigned i, unsigned j, unsigned color);
+typedef int Statistics[7];
 
-// Draw a block in the grid
-void draw_grid_block(unsigned i, unsigned j, unsigned color);
+void draw_game_block(blocks i, blocks j, unsigned size, unsigned color);
 
-// Delete a hole line of the grid
+void draw_block(unsigned x, unsigned y, unsigned size, unsigned color);
+
+void draw_grid_block(blocks i, blocks j, unsigned size, unsigned color);
+
 void delete_line(unsigned i);
 
-// Draw the entire grid (used for debugging)
 void draw_grid(void);
 
 void draw_outer_frame(blocks i, blocks j, blocks width, blocks height);
 
 void draw_inner_frame(blocks i, blocks j, blocks width, blocks height, boolean thick);
 
-void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str, unsigned size, unsigned scale);
-
-void setup_game_screen(void);
+void write_title(blocks i, blocks j, unsigned diff_x, unsigned diff_y, char *str, unsigned size, unsigned scale, unsigned color);
 
 void reset_game_screen(void);
 
@@ -117,6 +117,8 @@ void setup_next_frame(void);
 
 void setup_level_frame(void);
 
+void screen_update_stats(Statistics stats);
+
 void setup_statistics_frame(void);
 
 void setup_game_frame(void);
@@ -128,6 +130,8 @@ void screen_update_score(unsigned score);
 void screen_update_top(unsigned top);
 
 void screen_update_level(unsigned level);
+
+void screen_clear_next(void);
 
 void display_reset_msg(void);
 

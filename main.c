@@ -16,20 +16,23 @@
 
 static const char FromGame[] = "tetris";
 
-const unsigned LINES_PER_LEVEL = 5;
-const unsigned SCORE_PER_CLEAR[4] = {100, 300, 500, 800};
-const unsigned SPEDUP_ROUNDS = 2;
-const unsigned SPEDUP_REDUCTION = 3;
+#define BASE_DELAY 250000; // micro seconds
+#define LINES_PER_LEVEL 5;
+#define SPEDUP_ROUNDS 2;
+#define SPEDUP_REDUCTION 3;
 
+unsigned const SCORE_PER_CLEAR[4] = {100, 300, 500, 800};
 unsigned grid[GAME_GRID_HEIGHT][GAME_GRID_WIDTH] = {0};
-unsigned delay = 250000; // micro seconds
-unsigned cur_delay = 250000;
+unsigned delay = BASE_DELAY; 
+unsigned cur_delay = BASE_DELAY;
 
 unsigned spedup_rounds_left = 0;
 unsigned game_level = 1;
 unsigned closed_lines = 0;
 unsigned top = 0;
 unsigned score = 0;
+Tile next_tile;
+Statistics stats;
 
 Queue queue;
 
@@ -87,6 +90,12 @@ boolean check_rotation_collision(Tile tile)
             return TRUE;
 
    return FALSE;
+}
+
+void update_next_tile(void)
+{
+   next_tile = create_tile(stats);
+   screen_update_next(next_tile);
 }
 
 void update_score(unsigned cleared)
@@ -151,9 +160,9 @@ void save_to_grid(Tile tile)
          for (int j = 0; j < GAME_GRID_WIDTH; j++)
          {
             grid[i + 1][j] = grid[i][j];
-            draw_grid_block(i, j, 0);
+            draw_grid_block(i, j, BLOCK_SIZE, 0);
             if (grid[i + 1][j])
-               draw_grid_block(i + 1, j, grid[i + 1][j]);
+               draw_grid_block(i + 1, j, BLOCK_SIZE, grid[i + 1][j]);
          }
       }
    }
@@ -199,7 +208,10 @@ void move_tile(Tile *tile, char dir)
 
 boolean run()
 {
-   Tile tile = create_tile();
+   Tile tile = next_tile;
+   update_next_tile();
+   stats[tile.type]++;
+   screen_update_stats(stats);
 
    put_tile(tile); // spawna nova tile
 
@@ -255,7 +267,7 @@ void reset_grid()
       for (int j = 0; j < GAME_GRID_WIDTH; j++)
       {
          grid[i][j] = 0;
-         draw_grid_block(i, j, 0);
+         draw_grid_block(i, j, BLOCK_SIZE, 0);
       }
 }
 
@@ -267,14 +279,34 @@ void restart_game()
       screen_update_top(top);
    }
 
+   delay = BASE_DELAY;
+   cur_delay = delay;
    spedup_rounds_left = 0;
    game_level = 1;
    closed_lines = 0;
    score = 0;
+   for (int i = 0; i < 7; i++)
+      stats[i] = 0;
 
    reset_game_screen();
    initQueue(&queue);
    reset_grid();
+   screen_clear_next();
+   screen_update_stats(stats);
+}
+
+void setup_game_screen(void)
+{
+   setup_game_frame();
+   setup_type_frame();
+   setup_lines_frame();
+   setup_score_frame();
+   setup_next_frame();
+   setup_level_frame();
+   setup_statistics_frame();
+   update_next_tile();
+   draw_statistics_tiles();
+   // draw_grid(); // debugging
 }
 
 void start_game()
@@ -304,14 +336,8 @@ void start_game()
 
       // espera pelo reset
       while (1)
-      {
-         if (!isQueueEmpty(&queue))
-         {
-            char c = dequeue(&queue);
-            if (c == 'r')
-               break;
-         }
-      }
+         if (!isQueueEmpty(&queue) && dequeue(&queue) == 'r')
+            break;
 
       restart_game();
    }

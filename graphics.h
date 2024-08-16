@@ -22,7 +22,7 @@ void draw_rect(int x, int y, int width, int height, int thickness, unsigned colo
 // Draw a single square of size BLOCK_SIZE
 void draw_square(int pos_x, int pos_y, unsigned size, unsigned color);
 
-void write_string(unsigned x, unsigned y, const void *str, unsigned size, unsigned scale);
+void write_string(unsigned x, unsigned y, const void *str, unsigned size, unsigned scale, unsigned color);
 
 void display_char(unsigned *x, unsigned y, char c, unsigned scale, unsigned color);
 

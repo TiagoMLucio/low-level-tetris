@@ -28,14 +28,14 @@ void draw_square(int x, int y, unsigned size, unsigned color)
             fb_pixel(x + i, y + j, color);
 }
 
-void write_string(unsigned x, unsigned y, const void *str, unsigned size, unsigned scale)
+void write_string(unsigned x, unsigned y, const void *str, unsigned size, unsigned scale, unsigned color)
 {
     const char *pChar = (const char *)str;
 
     while (size--)
     {
         char c = *pChar++;
-        display_char(&x, y, c, scale, NORMAL_COLOR);
+        display_char(&x, y, c, scale, color);
     }
 }
 
