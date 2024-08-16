@@ -31,8 +31,8 @@ endif
 RASPPI	?= 2
 AARCH64 ?= 0
 PREFIX	?= arm-none-eabi-
-DEBUG   ?= 0
-LOGGING ?= 0
+DEBUG	?= 0
+LOGGING	?= 0
 
 CC	= $(PREFIX)gcc
 AS	= $(CC)
@@ -53,7 +53,12 @@ AFLAGS	+= $(ARCH) -DRASPPI=$(RASPPI)
 CFLAGS	+= $(ARCH) -Wall -Wno-psabi -fsigned-char -fno-builtin -nostdinc -nostdlib \
 	   -std=gnu99 -undef -DRASPPI=$(RASPPI) -I $(USPIHOME)/include $(OPTIMIZE) \
 	   -D__IEEE_LITTLE_ENDIAN -D__INT32_TYPE__=int \
-	   -D__INTPTR_TYPE__=long\ int -D__UINTPTR_TYPE__=long\ unsigned\ int
+	   -D__INTPTR_TYPE__=long\ int -D__UINTPTR_TYPE__=long\ unsigned\ int \
+	   -DLOGGING=$(LOGGING)
+
+ifeq ($(strip $(DEBUG)),0)
+CFLAGS	+= -DNDEBUG
+endif
 
 %.o: %.S
 	@echo "  AS    $@"
